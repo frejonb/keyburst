@@ -68,6 +68,9 @@ async function createBurst(x, y) {
   await new Promise(resolve => {
     const burst1 = new mojs.Burst({
         ...burst1Config,
+        onStart() {
+          new Audio('./laser.wav').play();
+        },
         onComplete(){
           burst1.el.parentNode.removeChild(burst1.el);
         }
@@ -116,6 +119,7 @@ async function handleKeyEvent(keyEvent) {
   await createBurst(x, y)
   
 }
+
 
 document.addEventListener("keydown", async () =>
   await handleKeyEvent())
