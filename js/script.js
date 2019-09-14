@@ -65,22 +65,24 @@ const smallCircleConfig = {
 };
   
 async function createBurst(x, y) {
-  new mojs.Burst(burst1Config)
-    .tune({ x: x, y: y })
-    .generate()
-    .replay();
-  
-  new mojs.Burst(largeBurstConfig)
-    .tune({ x: x, y: y })
-    .replay();
-  
-  new mojs.Shape(largeCircleConfig)
-    .tune({ x: x, y: y })
-    .replay();
-  
-  new mojs.Shape(smallCircleConfig)
-    .tune({ x: x, y: y })
-    .replay();
+  await new Promise(resolve => {
+    new mojs.Burst(burst1Config)
+      .tune({ x: x, y: y })
+      .generate()
+      .replay();
+    
+    new mojs.Burst(largeBurstConfig)
+      .tune({ x: x, y: y })
+      .replay();
+    
+    new mojs.Shape(largeCircleConfig)
+      .tune({ x: x, y: y })
+      .replay();
+    
+    new mojs.Shape(smallCircleConfig)
+      .tune({ x: x, y: y })
+      .replay();
+  });
 }
 
 async function handleBurst(keyEvent) {
