@@ -66,26 +66,47 @@ const smallCircleConfig = {
   
 async function createBurst(x, y) {
   await new Promise(resolve => {
-    new mojs.Burst(burst1Config)
+    const burst1 = new mojs.Burst({
+        ...burst1Config,
+        onComplete(){
+          burst1.el.parentNode.removeChild(burst1.el);
+        }
+      })
       .tune({ x: x, y: y })
       .generate()
       .replay();
     
-    new mojs.Burst(largeBurstConfig)
+    const largeBurst = new mojs.Burst({
+        ...largeBurstConfig,
+        onComplete(){
+          largeBurst.el.parentNode.removeChild(largeBurst.el);
+        }
+      })
       .tune({ x: x, y: y })
       .replay();
     
-    new mojs.Shape(largeCircleConfig)
+    const largeCircle = new mojs.Shape({
+        ...largeCircleConfig,
+        onComplete(){
+          largeCircle.el.parentNode.removeChild(largeCircle.el);
+        }
+      })
       .tune({ x: x, y: y })
       .replay();
     
-    new mojs.Shape(smallCircleConfig)
+    const smallCircle = new mojs.Shape({
+        ...smallCircleConfig,
+        onComplete(){
+          smallCircle.el.parentNode.removeChild(smallCircle.el);
+        }
+      })
       .tune({ x: x, y: y })
       .replay();
+
   });
 }
 
-async function handleBurst(keyEvent) {
+async function handleKeyEvent(keyEvent) {
   const maxWidth = document.documentElement.clientWidth
   const maxHeight = document.documentElement.clientHeight
 
@@ -97,4 +118,4 @@ async function handleBurst(keyEvent) {
 }
 
 document.addEventListener("keydown", async () =>
-  await handleBurst())
+  await handleKeyEvent())
