@@ -96,5 +96,5 @@ async function handleBurst(keyEvent) {
   
 }
 
-document.addEventListener("keydown", () =>
-  handleBurst())
+document.addEventListener("keydown", async () =>
+  await handleBurst())
