@@ -123,55 +123,13 @@ async function handleKeyEvent(keyEvent) {
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
 
-function connecthandler(e) {
-  addgamepad(e.gamepad);
+async function connecthandler(e) {
+  await addgamepad(e.gamepad);
 }
 
-function addgamepad(gamepad) {
+async function addgamepad(gamepad) {
   controllers[gamepad.index] = gamepad;
-
-  var d = document.createElement("div");
-  d.setAttribute("id", "controller" + gamepad.index);
-
-  var t = document.createElement("h1");
-  t.appendChild(document.createTextNode("gamepad: " + gamepad.id));
-  d.appendChild(t);
-
-  var b = document.createElement("div");
-  b.className = "buttons";
-  for (var i = 0; i < gamepad.buttons.length; i++) {
-    var e = document.createElement("span");
-    e.className = "button";
-    //e.id = "b" + i;
-    e.innerHTML = i;
-    b.appendChild(e);
-  }
-
-  d.appendChild(b);
-
-  var a = document.createElement("div");
-  a.className = "axes";
-
-  for (var i = 0; i < gamepad.axes.length; i++) {
-    var p = document.createElement("progress");
-    p.className = "axis";
-    //p.id = "a" + i;
-    p.setAttribute("max", "2");
-    p.setAttribute("value", "1");
-    p.innerHTML = i;
-    a.appendChild(p);
-  }
-
-  d.appendChild(a);
-
-  // See https://github.com/luser/gamepadtest/blob/master/index.html
-  var start = document.getElementById("start");
-  if (start) {
-    start.style.display = "none";
-  }
-
-  document.body.appendChild(d);
-  requestAnimationFrame(updateStatus);
+  requestAnimationFrame(async () => await updateStatus());
 }
 
 function disconnecthandler(e) {
@@ -184,40 +142,34 @@ function removegamepad(gamepad) {
   delete controllers[gamepad.index];
 }
 
-function updateStatus() {
+async function updateStatus() {
   if (!haveEvents) {
     scangamepads();
   }
 
-  var i = 0;
-  var j;
+  var controller = controllers[0];
 
-  for (j in controllers) {
-    var controller = controllers[j];
-
-    for (i = 0; i < controller.buttons.length; i++) {
-      var val = controller.buttons[i];
-      var pressed = val == 1.0;
-      if (typeof(val) == "object") {
-        pressed = val.pressed;
-        val = val.value;
-      }
-
-      if (pressed) {
-        console.log(pressed);
-        (async () => await handleKeyEvent())();
-      }
+  var pressed = controller.buttons.flter((button) => {
+    if(typeof(button) == "object") {
+      return button.pressed;
+    } else {
+      return button == 1.0;
     }
+  });
 
-    var axes = d.getElementsByClassName("axis");
-    for (i = 0; i < controller.axes.length; i++) {
-      var a = axes[i];
-      a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
-      a.setAttribute("value", controller.axes[i] + 1);
-    }
+  if (pressed.length > 0) {
+    console.log(`pressed ${pressed.length} buttons`);
+    await handleKeyEvent();
   }
 
-  requestAnimationFrame(updateStatus);
+
+  // for (i = 0; i < controller.axes.length; i++) {
+  //   var a = axes[i];
+  //   a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
+  //   a.setAttribute("value", controller.axes[i] + 1);
+  // }
+
+  requestAnimationFrame(async () => await updateStatus());
 }
 
 function scangamepads() {
@@ -234,7 +186,7 @@ function scangamepads() {
 }
 
 
-window.addEventListener("gamepadconnected", connecthandler);
+window.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
 window.addEventListener("gamepaddisconnected", disconnecthandler);
 
 if (!haveEvents) {
