@@ -178,9 +178,6 @@ async function updateStatus() {
 window.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
 window.addEventListener("gamepaddisconnected", disconnecthandler);
 
-if (!haveEvents) {
-  setInterval(scangamepads, 500);
-}
 
 document.addEventListener("keydown", async () =>
   await handleKeyEvent())
