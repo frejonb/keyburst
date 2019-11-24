@@ -129,6 +129,7 @@ async function connecthandler(e) {
 
 async function addgamepad(gamepad) {
   controllers[gamepad.index] = gamepad;
+  console.log(`Detected gamepag ${gamepad.id}`);
   requestAnimationFrame(async () => await updateStatus());
 }
 
@@ -149,7 +150,7 @@ async function updateStatus() {
 
   var controller = controllers[0];
 
-  var pressed = controller.buttons.flter((button) => {
+  var pressed = controller.buttons.filter((button) => {
     if(typeof(button) == "object") {
       return button.pressed;
     } else {
