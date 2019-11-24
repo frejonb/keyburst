@@ -129,8 +129,8 @@ async function connecthandler(e) {
 
 async function addgamepad(gamepad) {
   controllers[gamepad.index] = gamepad;
-  console.log(`Detected gamepad ${gamepad.id}`);
-  requestAnimationFrame(async () => await updateStatus());
+  console.log(`Detected gamepag ${gamepad.id}`);
+  await updateStatus();
 }
 
 function disconnecthandler(e) {
@@ -144,6 +144,9 @@ function removegamepad(gamepad) {
 }
 
 async function updateStatus() {
+  if (!haveEvents) {
+    scangamepads();
+  }
   console.log("updating status");
 
   var controller = controllers[0];
@@ -161,10 +164,6 @@ async function updateStatus() {
     await handleKeyEvent();
   }
 
-  console.log("done");
-
-  await updateStatus();
-
 
   // for (i = 0; i < controller.axes.length; i++) {
   //   var a = axes[i];
@@ -172,12 +171,29 @@ async function updateStatus() {
   //   a.setAttribute("value", controller.axes[i] + 1);
   // }
 
+  await updateStatus();
+}
+
+function scangamepads() {
+  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  for (var i = 0; i < gamepads.length; i++) {
+    if (gamepads[i]) {
+      if (gamepads[i].index in controllers) {
+        controllers[gamepads[i].index] = gamepads[i];
+      } else {
+        addgamepad(gamepads[i]);
+      }
+    }
+  }
 }
 
 
-document.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
-document.addEventListener("gamepaddisconnected", disconnecthandler);
+window.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
+window.addEventListener("gamepaddisconnected", disconnecthandler);
 
+if (!haveEvents) {
+  setInterval(scangamepads, 500);
+}
 
 document.addEventListener("keydown", async () =>
   await handleKeyEvent())
