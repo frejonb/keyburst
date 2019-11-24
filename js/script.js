@@ -144,9 +144,9 @@ function removegamepad(gamepad) {
 }
 
 async function updateStatus() {
-  if (!haveEvents) {
-    scangamepads();
-  }
+  // if (!haveEvents) {
+  //   scangamepads();
+  // }
   console.log("updating status");
 
   var controller = controllers[0];
@@ -164,7 +164,7 @@ async function updateStatus() {
     await handleKeyEvent();
   }
 
-
+  console.log("done");
   // for (i = 0; i < controller.axes.length; i++) {
   //   var a = axes[i];
   //   a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
