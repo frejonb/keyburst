@@ -204,6 +204,7 @@ function updateStatus() {
       }
 
       if (pressed) {
+        console.log(pressed);
         (async () => await handleKeyEvent())();
       }
     }
