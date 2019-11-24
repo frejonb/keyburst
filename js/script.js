@@ -119,7 +119,7 @@ async function handleKeyEvent(keyEvent) {
   await createBurst(x, y)
   
 }
-
+console.log("Waiting for gamepad.");
 window.addEventListener("gamepadconnected", function(e) {
   console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
     e.gamepad.index, e.gamepad.id,
