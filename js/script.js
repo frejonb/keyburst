@@ -161,7 +161,7 @@ async function updateStatus() {
 
   if (pressed.length > 0) {
     console.log(`pressed ${pressed.length} buttons`);
-    await handleKeyEvent();
+    // await handleKeyEvent();
   }
 
   console.log("done");
