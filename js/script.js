@@ -161,6 +161,10 @@ async function updateStatus() {
     await handleKeyEvent();
   }
 
+  console.log("done");
+
+  await updateStatus();
+
 
   // for (i = 0; i < controller.axes.length; i++) {
   //   var a = axes[i];
@@ -168,7 +172,6 @@ async function updateStatus() {
   //   a.setAttribute("value", controller.axes[i] + 1);
   // }
 
-  requestAnimationFrame(async () => await updateStatus());
 }
 
 
