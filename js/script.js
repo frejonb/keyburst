@@ -194,11 +194,8 @@ function updateStatus() {
 
   for (j in controllers) {
     var controller = controllers[j];
-    var d = document.getElementById("controller" + j);
-    var buttons = d.getElementsByClassName("button");
 
     for (i = 0; i < controller.buttons.length; i++) {
-      var b = buttons[i];
       var val = controller.buttons[i];
       var pressed = val == 1.0;
       if (typeof(val) == "object") {
@@ -206,13 +203,8 @@ function updateStatus() {
         val = val.value;
       }
 
-      var pct = Math.round(val * 100) + "%";
-      b.style.backgroundSize = pct + " " + pct;
-
       if (pressed) {
-        b.className = "button pressed";
-      } else {
-        b.className = "button";
+        (async () => await handleKeyEvent())();
       }
     }
 
