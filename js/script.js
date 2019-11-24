@@ -129,7 +129,7 @@ async function connecthandler(e) {
 
 async function addgamepad(gamepad) {
   controllers[gamepad.index] = gamepad;
-  console.log(`Detected gamepag ${gamepad.id}`);
+  console.log(`Detected gamepad ${gamepad.id}`);
   requestAnimationFrame(async () => await updateStatus());
 }
 
@@ -175,8 +175,8 @@ async function updateStatus() {
 }
 
 
-window.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
-window.addEventListener("gamepaddisconnected", disconnecthandler);
+document.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
+document.addEventListener("gamepaddisconnected", disconnecthandler);
 
 
 document.addEventListener("keydown", async () =>
