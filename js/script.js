@@ -120,7 +120,6 @@ async function handleBurstEvent() {
   
 }
 
-var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
 
 function scangamepads() {
