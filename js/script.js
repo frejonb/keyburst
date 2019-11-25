@@ -182,7 +182,7 @@ function frameLoop() {
     scangamepads();
   }
   handleInput();
-  setInterval(requestAnimationFrame(frameLoop), 500);
+  requestAnimationFrame(frameLoop);
   
 }
 
