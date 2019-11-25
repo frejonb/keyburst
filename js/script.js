@@ -128,12 +128,26 @@ function connecthandler(e) {
   startAnimation()
 }
 
+function disconnecthandler(e) {
+  delete controllers[e.gamepad.index];
+}
+
 function startAnimation() {
   requestAnimationFrame(frameLoop);
 }
 
-function disconnecthandler(e) {
-  delete controllers[e.gamepad.index];
+function scangamepads() {
+  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  for (var i = 0; i < gamepads.length; i++) {
+    if (gamepads[i]) {
+      if (gamepads[i].index in controllers) {
+        controllers[gamepads[i].index] = gamepads[i];
+      } else {
+        controllers[e.gamepad.index] = e.gamepad;
+        startAnimation()
+      }
+    }
+  }
 }
 
 function frameLoop() {
@@ -168,26 +182,10 @@ function frameLoop() {
   requestAnimationFrame(frameLoop);
 }
 
-function scangamepads() {
-  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-  for (var i = 0; i < gamepads.length; i++) {
-    if (gamepads[i]) {
-      if (gamepads[i].index in controllers) {
-        controllers[gamepads[i].index] = gamepads[i];
-      } else {
-        addgamepad(gamepads[i]);
-      }
-    }
-  }
-}
-
-
-window.addEventListener("gamepadconnected", connecthandler);
-window.addEventListener("gamepaddisconnected", disconnecthandler);
-
 if (!haveEvents) {
   setInterval(scangamepads, 500);
 }
 
-document.addEventListener("keydown", async () =>
-  await handleBurstEvent());
+document.addEventListener("keydown", async () => await handleBurstEvent());
+window.addEventListener("gamepadconnected", connecthandler);
+window.addEventListener("gamepaddisconnected", disconnecthandler);
