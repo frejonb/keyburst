@@ -155,7 +155,6 @@ function handleInput(gp) {
   // }
 }
 function handleFrame() {
-  scangamepads()
   if (controllers[0]) {
     handleInput(controllers[0]);
   }
@@ -165,4 +164,5 @@ function handleFrame() {
 document.addEventListener("keydown", async () =>
   await handleBurstEvent());
 
+scangamepads()
 requestAnimationFrame(handleFrame);
