@@ -133,6 +133,7 @@ function scangamepads() {
 
 function handleInput(gp) {
   var pressed = gp.buttons.filter((button) => {
+    console.log(button);
     if(typeof(button) == "object") {
       return button.pressed;
     } else {
@@ -140,11 +141,11 @@ function handleInput(gp) {
     }
   });
 
-  if (pressed.length > 0) {
-    console.log(`pressed ${pressed.length} buttons`);
-  } else {
-    console.log("not pressing anything");
-  }
+  // if (pressed.length > 0) {
+  //   console.log(`pressed ${pressed.length} buttons`);
+  // } else {
+  //   console.log("not pressing anything");
+  // }
 
   // for (i = 0; i < controller.axes.length; i++) {
   //   var a = axes[i];
@@ -153,18 +154,10 @@ function handleInput(gp) {
   // }
 }
 function handleFrame() {
-
   scangamepads()
   if (controllers[0]) {
-    console.log("found controllers!")
-    var controller = controllers[0];
-    console.log("handle input");
-    handleInput(controller);
+    handleInput(controllers[0]);
   }
-
-  console.log("done");
-  
-
   requestAnimationFrame(handleFrame);
 }
 
