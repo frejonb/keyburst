@@ -124,7 +124,9 @@ var controllers = {};
 
 function scangamepads() {
   var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  console.log(`# of gp ${gamepads.length}`)
   for (var i = 0; i < gamepads.length; i++) {
+    console.log(gamepads[i]);
     if (gamepads[i] && !(gamepads[i].index in controllers)) {
         controllers[gamepads[i].index] = gamepads[i];
     }
