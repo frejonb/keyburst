@@ -181,9 +181,9 @@ function frameLoop() {
   if (!haveEvents) {
     scangamepads();
   }
-
-  setInterval(handleInput, 500);
-  requestAnimationFrame(frameLoop);
+  handleInput();
+  setInterval(requestAnimationFrame(frameLoop), 500);
+  
 }
 
 if (!haveEvents) {
