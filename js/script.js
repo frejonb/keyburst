@@ -170,6 +170,6 @@ function handleFrame() {
 }
 
 document.addEventListener("keydown", async () =>
-  await handleKeyEvent());
+  await handleBurstEvent());
 
 requestAnimationFrame(handleFrame);
