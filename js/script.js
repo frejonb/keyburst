@@ -155,12 +155,9 @@ function handleInput(gp) {
 function handleFrame() {
 
   scangamepads()
-  console.log(controllers[0]);
-  console.log(controllers.length);
-  if (controllers.length > 0) {
+  if (controllers[0]) {
     console.log("found controllers!")
     var controller = controllers[0];
-  
     console.log("handle input");
     handleInput(controller);
   }
