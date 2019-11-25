@@ -150,11 +150,7 @@ function scangamepads() {
   }
 }
 
-function frameLoop() {
-  if (!haveEvents) {
-    scangamepads();
-  }
-
+function handleInput() {
   var i = 0;
   var j;
 
@@ -179,6 +175,14 @@ function frameLoop() {
     // }
   }
 
+}
+
+function frameLoop() {
+  if (!haveEvents) {
+    scangamepads();
+  }
+
+  setInterval(handleInput, 500);
   requestAnimationFrame(frameLoop);
 }
 
