@@ -124,12 +124,8 @@ var controllers = {};
 
 function scangamepads() {
   var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-  console.log(`# of gp ${gamepads.length}`)
   for (var i = 0; i < gamepads.length; i++) {
-    console.log(gamepads[i]);
     if (gamepads[i] && !(gamepads[i].index in controllers)) {
-        console.log("found gp")
-        console.log(gamepads[i]);
         controllers[gamepads[i].index] = gamepads[i];
     }
   }
@@ -158,10 +154,9 @@ function handleInput(gp) {
 }
 function handleFrame() {
 
-  console.log("scan gamepads");
   scangamepads()
-  console.log("asdadadas")
   console.log(controllers[0]);
+  console.log(controllers.length);
   if (controllers.length > 0) {
     console.log("found controllers!")
     var controller = controllers[0];
