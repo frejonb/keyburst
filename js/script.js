@@ -123,35 +123,17 @@ async function handleBurstEvent() {
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
 
-function connecthandler(e) {
-  addgamepad(e.gamepad);
-}
-
-function addgamepad(gamepad) {
-  controllers[gamepad.index] = gamepad;
-  console.log(`Detected gamepag ${gamepad.id}`);
-  requestAnimationFrame(updateStatus);
-}
-
-function disconnecthandler(e) {
-  removegamepad(e.gamepad);
-}
-
-function removegamepad(gamepad) {
-  var d = document.getElementById("controller" + gamepad.index);
-  document.body.removeChild(d);
-  delete controllers[gamepad.index];
-}
-
-function updateStatus() {
-  if (!haveEvents) {
-    scangamepads();
+function scangamepads() {
+  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  for (var i = 0; i < gamepads.length; i++) {
+    if (gamepads[i] && !(gamepads[i].index in controllers)) {
+        controllers[gamepads[i].index] = gamepads[i];
+    }
   }
-  console.log("updating status");
+}
 
-  var controller = controllers[0];
-
-  var pressed = controller.buttons.filter((button) => {
+function handleInput(gp) {
+  var pressed = gp.buttons.filter((button) => {
     if(typeof(button) == "object") {
       return button.pressed;
     } else {
@@ -161,39 +143,30 @@ function updateStatus() {
 
   if (pressed.length > 0) {
     console.log(`pressed ${pressed.length} buttons`);
-    // await handleKeyEvent();
+  } else {
+    console.log("not pressing anything");
   }
 
-  console.log("done");
   // for (i = 0; i < controller.axes.length; i++) {
   //   var a = axes[i];
   //   a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
   //   a.setAttribute("value", controller.axes[i] + 1);
   // }
-
-  requestAnimationFrame(updateStatus);
 }
+function handleFrame() {
 
-function scangamepads() {
-  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-  for (var i = 0; i < gamepads.length; i++) {
-    if (gamepads[i]) {
-      if (gamepads[i].index in controllers) {
-        controllers[gamepads[i].index] = gamepads[i];
-      } else {
-        addgamepad(gamepads[i]);
-      }
-    }
-  }
+  console.log("scan gamepads");
+  scangamepads()
+  var controller = controllers[0];
+
+  console.log("handle input");
+  handleInput(controller);
+
+  console.log("done");
+  
+
+  requestAnimationFrame(handleFrame);
 }
-
-
-window.addEventListener("gamepadconnected", (e) => connecthandler(e));
-window.addEventListener("gamepaddisconnected", disconnecthandler);
-
-// if (!haveEvents) {
-//   setInterval(scangamepads, 500);
-// }
 
 document.addEventListener("keydown", async () =>
   await handleKeyEvent())
