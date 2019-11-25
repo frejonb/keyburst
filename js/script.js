@@ -140,10 +140,8 @@ function handleInput(gp) {
   //     return button == 1.0;
   //   }
   // });
-  const pressed = gp.buttons[0].pressed;
-  console.log(pressed);
-
-  if (pressed) {
+  console.log("0");
+  if (gp.buttons[0].pressed) {
     (async () => await handleBurstEvent())();
     console.log(`pressed ${pressed.length} buttons`);
   } else {
