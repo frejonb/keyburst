@@ -140,6 +140,7 @@ function handleInput(gp) {
       return button == 1.0;
     }
   });
+  console.log(pressed);
 
   // if (pressed.length > 0) {
   //   console.log(`pressed ${pressed.length} buttons`);
