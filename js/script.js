@@ -142,7 +142,7 @@ function handleInput(gp) {
   // });
   console.log("0");
   if (gp.buttons[0].pressed) {
-    (async () => await handleBurstEvent())();
+    // (async () => await handleBurstEvent())();
     console.log(`pressed ${pressed.length} buttons`);
   } else {
     console.log("not pressing anything");
