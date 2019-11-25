@@ -156,10 +156,12 @@ function handleFrame() {
 
   console.log("scan gamepads");
   scangamepads()
-  var controller = controllers[0];
-
-  console.log("handle input");
-  handleInput(controller);
+  if (controllers.length > 0) {
+    var controller = controllers[0];
+  
+    console.log("handle input");
+    handleInput(controller);
+  }
 
   console.log("done");
   
@@ -170,4 +172,4 @@ function handleFrame() {
 document.addEventListener("keydown", async () =>
   await handleKeyEvent());
 
-  requestAnimationFrame(handleFrame);
+requestAnimationFrame(handleFrame);
