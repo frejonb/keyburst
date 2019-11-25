@@ -109,7 +109,7 @@ async function createBurst(x, y) {
   });
 }
 
-async function handleKeyEvent(keyEvent) {
+async function handleBurstEvent() {
   const maxWidth = document.documentElement.clientWidth
   const maxHeight = document.documentElement.clientHeight
 
@@ -123,14 +123,14 @@ async function handleKeyEvent(keyEvent) {
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
 
-async function connecthandler(e) {
-  await addgamepad(e.gamepad);
+function connecthandler(e) {
+  addgamepad(e.gamepad);
 }
 
-async function addgamepad(gamepad) {
+function addgamepad(gamepad) {
   controllers[gamepad.index] = gamepad;
   console.log(`Detected gamepag ${gamepad.id}`);
-  await updateStatus();
+  requestAnimationFrame(updateStatus);
 }
 
 function disconnecthandler(e) {
@@ -143,10 +143,10 @@ function removegamepad(gamepad) {
   delete controllers[gamepad.index];
 }
 
-async function updateStatus() {
-  // if (!haveEvents) {
-  //   scangamepads();
-  // }
+function updateStatus() {
+  if (!haveEvents) {
+    scangamepads();
+  }
   console.log("updating status");
 
   var controller = controllers[0];
@@ -171,7 +171,7 @@ async function updateStatus() {
   //   a.setAttribute("value", controller.axes[i] + 1);
   // }
 
-  await updateStatus();
+  requestAnimationFrame(updateStatus);
 }
 
 function scangamepads() {
@@ -188,12 +188,12 @@ function scangamepads() {
 }
 
 
-window.addEventListener("gamepadconnected", async (e) => await connecthandler(e));
+window.addEventListener("gamepadconnected", (e) => connecthandler(e));
 window.addEventListener("gamepaddisconnected", disconnecthandler);
 
-if (!haveEvents) {
-  setInterval(scangamepads, 500);
-}
+// if (!haveEvents) {
+//   setInterval(scangamepads, 500);
+// }
 
 document.addEventListener("keydown", async () =>
   await handleKeyEvent())
