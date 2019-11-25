@@ -142,11 +142,12 @@ function handleInput(gp) {
   });
   console.log(pressed);
 
-  // if (pressed.length > 0) {
-  //   console.log(`pressed ${pressed.length} buttons`);
-  // } else {
-  //   console.log("not pressing anything");
-  // }
+  if (pressed.length > 0) {
+    (async () => await handleBurstEvent())();
+    console.log(`pressed ${pressed.length} buttons`);
+  } else {
+    console.log("not pressing anything");
+  }
 
   // for (i = 0; i < controller.axes.length; i++) {
   //   var a = axes[i];
