@@ -128,6 +128,8 @@ function scangamepads() {
   for (var i = 0; i < gamepads.length; i++) {
     console.log(gamepads[i]);
     if (gamepads[i] && !(gamepads[i].index in controllers)) {
+        console.log("found gp")
+        console.log(gamepads[i]);
         controllers[gamepads[i].index] = gamepads[i];
     }
   }
