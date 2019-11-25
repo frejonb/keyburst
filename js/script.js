@@ -132,17 +132,18 @@ function scangamepads() {
 }
 
 function handleInput(gp) {
-  var pressed = gp.buttons.filter((button) => {
-    console.log(button);
-    if(typeof(button) == "object") {
-      return button.pressed;
-    } else {
-      return button == 1.0;
-    }
-  });
+  // var pressed = gp.buttons.filter((button) => {
+  //   console.log(button);
+  //   if(typeof(button) == "object") {
+  //     return button.pressed;
+  //   } else {
+  //     return button == 1.0;
+  //   }
+  // });
+  const pressed = gp.buttons[0].pressed;
   console.log(pressed);
 
-  if (pressed.length > 0) {
+  if (pressed) {
     (async () => await handleBurstEvent())();
     console.log(`pressed ${pressed.length} buttons`);
   } else {
