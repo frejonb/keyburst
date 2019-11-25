@@ -168,7 +168,7 @@ function handleInput() {
       }
 
       if (pressed) {
-        wait(100).then(() => handleBurstEvent());
+        wait(500).then(() => handleBurstEvent());
       }
     }
 
