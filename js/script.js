@@ -150,6 +150,8 @@ function scangamepads() {
   }
 }
 
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 function handleInput() {
   var i = 0;
   var j;
@@ -166,7 +168,7 @@ function handleInput() {
       }
 
       if (pressed) {
-        handleBurstEvent()
+        wait(100).then(() => handleBurstEvent());
       }
     }
 
