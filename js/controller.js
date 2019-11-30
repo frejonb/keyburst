@@ -83,7 +83,10 @@ class Controller {
 
         for (j in controllers) {
             var controller = controllers[j];
-            action(controller.axes[0].toFixed(4), controller.axes[1].toFixed(4));
+            action(
+                ( 1 + controller.axes[0].toFixed(4) ) * window.innerWidth / 2,
+                ( 1 + controller.axes[1].toFixed(4) ) * window.innerHeight / 2,
+            );
         }
     }
 }
