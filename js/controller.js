@@ -69,7 +69,10 @@ class Controller {
                 if (!buttonsPressed[index].inCoolDown) {
                     buttonsPressed[index].inCoolDown = true;
                     setTimeout(() => delete buttonsPressed[index], BUTTON_DEBOUNCE_TIME);
-                    await action(mousePosition.x, mousePosition.y);
+                    await action(
+                        ( 1 + controller.axes[0].toFixed(4) ) * window.innerWidth / 2,
+                        ( 1 + controller.axes[1].toFixed(4) ) * window.innerHeight / 2,
+                    );;
                 }
             });
     }
