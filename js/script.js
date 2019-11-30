@@ -112,6 +112,19 @@ async function createBurst(x, y) {
   });
 }
 
+function drawCrossHair(x, y) {
+    const crossHair = new mojs.Shape({
+      shape:        'circle',     // shape 'circle' is default
+      radius:       25,           // shape radius
+      fill:         'transparent',// same as 'transparent'
+      stroke:       '#F64040',    // or 'cyan'
+      strokeWidth:  5,            // width of the stroke
+      isShowStart:  true,         // show before any animation starts
+    })
+    .tune({ x: x, y: y })
+    .play();
+}
+
 async function handleBurstEvent() {
   const maxWidth = document.documentElement.clientWidth
   const maxHeight = document.documentElement.clientHeight
@@ -183,9 +196,10 @@ function handleControllerInput() {
         registerButtonDown(i)
       }
     }
-    // for (i = 0; i < controller.axes.length; i++) {
-    //   controller.axes[i].toFixed(4);
-    // }
+    (async () => {
+      drawCrossHair(controller.axes[0].toFixed(4), controller.axes[1].toFixed(4))
+    })();
+    
   }
 
   Object.keys(buttonsPressed)
