@@ -13,7 +13,7 @@ function handleInput() {
   controller.handleStickInput(drawCrossHair(x, y));
   keyboard.handleKeyboardInput(() => animation.createRandomBurst());
   mouse.handleMouseInput(animation.createBurst);
-  mouse.handleMouseMovement(animation.drawCrossHair);
+  // mouse.handleMouseMovement(animation.drawCrossHair);
 }
 
 function frameLoop() {
