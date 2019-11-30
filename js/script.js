@@ -156,7 +156,7 @@ function scangamepads() {
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function registerButtonDown(buttonIndex) {
-  if (!(buttonIndex in buttons)) {
+  if (!(buttonIndex in buttonsPressed)) {
     buttonsPressed = {
       ...buttonsPressed,
       [buttonIndex]: {
