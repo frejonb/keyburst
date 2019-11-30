@@ -82,7 +82,10 @@ class Controller {
         var j;
 
         for (j in controllers) {
+            console.log("h")
             var controller = controllers[j];
+            console.log(controller.axes[0].toFixed(4));
+            console.log(controller.axes[1].toFixed(4));
             action(
                 ( 1 + controller.axes[0].toFixed(4) ) * window.innerWidth / 2,
                 ( 1 + controller.axes[1].toFixed(4) ) * window.innerHeight / 2,
