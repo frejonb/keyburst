@@ -1,3 +1,6 @@
+const KEYBOARD_DEBOUNCE_TIME = 500;
+const BUTTON_DEBOUNCE_TIME = 500;
+
 const COLORS = {
   RED:      '#FD5061',
   YELLOW:   '#FFCEA5',
@@ -122,10 +125,11 @@ async function handleBurstEvent() {
 
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
+var keysPressed = [];
+var buttonsPressed = [];
 
 function connecthandler(e) {
   controllers[e.gamepad.index] = e.gamepad;
-  startAnimation()
 }
 
 function disconnecthandler(e) {
@@ -144,7 +148,6 @@ function scangamepads() {
         controllers[gamepads[i].index] = gamepads[i];
       } else {
         controllers[e.gamepad.index] = e.gamepad;
-        startAnimation()
       }
     }
   }
@@ -152,7 +155,17 @@ function scangamepads() {
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-function handleInput() {
+function registerButtonDown(buttonIndex) {
+  if (!(buttonIndex in buttons)) {
+    buttonsPressed = {
+      ...buttonsPressed,
+      [buttonIndex]: {
+        inCoolDown: false
+      }
+    };
+  }
+}
+function handleControllerInput() {
   var i = 0;
   var j;
 
@@ -166,17 +179,50 @@ function handleInput() {
         pressed = val.pressed;
         val = val.value;
       }
-
       if (pressed) {
-        wait(500).then(() => handleBurstEvent());
+        registerButtonDown(i)
       }
     }
-
     // for (i = 0; i < controller.axes.length; i++) {
     //   controller.axes[i].toFixed(4);
     // }
   }
 
+  Object.keys(buttonsPressed)
+    .forEach(async (index) => {
+      if(!buttonsPressed[index].inCoolDown) {
+        buttonsPressed[index].inCoolDown = true;
+        setTimeout(() => delete buttonsPressed[index], BUTTON_DEBOUNCE_TIME);
+        await handleBurstEvent();
+      }
+    });
+
+}
+
+function registerKeyDown(e) {
+  if (!(e.key in keysPressed)) {
+    keysPressed = {
+      ...keysPressed,
+      [e.key]: {
+        inCoolDown: false
+      }
+    };
+  }
+}
+function handleKeyboardInput() {
+  Object.keys(keysPressed)
+    .forEach(async (key) => {
+      if(!keysPressed[key].inCoolDown) {
+        keysPressed[key].inCoolDown = true;
+        setTimeout(() => delete keysPressed[key], KEYBOARD_DEBOUNCE_TIME);
+        await handleBurstEvent();
+      }
+    });
+}
+
+function handleInput() {
+  handleControllerInput();
+  handleKeyboardInput();
 }
 
 function frameLoop() {
@@ -192,6 +238,8 @@ if (!haveEvents) {
   setInterval(scangamepads, 500);
 }
 
-document.addEventListener("keydown", async () => await handleBurstEvent());
+document.addEventListener("keydown", (e) => registerKeyDown(e));
 window.addEventListener("gamepadconnected", connecthandler);
 window.addEventListener("gamepaddisconnected", disconnecthandler);
+
+startAnimation();
