@@ -9,11 +9,11 @@ function startAnimation() {
 }
 
 function handleInput() {
-  controller.handleButtonInput((x, y) => animation.createBurst(x, y));
-  controller.handleStickInput(animation.drawCrossHair);
   keyboard.handleKeyboardInput(() => animation.createRandomBurst());
   mouse.handleMouseInput(animation.createBurst);
-  // mouse.handleMouseMovement(animation.drawCrossHair);
+  mouse.handleMouseMovement(animation.drawCrossHair);
+  controller.handleButtonInput((x, y) => animation.createBurst(x, y));
+  controller.handleStickInput(animation.drawCrossHair);
 }
 
 function frameLoop() {
