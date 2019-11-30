@@ -32,7 +32,6 @@ class Mouse {
     }
 
     handleMouseMovement(action) {
-        console.log(mousePosition.x)
         action(mousePosition.x, mousePosition.y);
     }
 }
