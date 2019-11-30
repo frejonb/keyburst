@@ -1,5 +1,6 @@
 const KEYBOARD_DEBOUNCE_TIME = 500;
 const BUTTON_DEBOUNCE_TIME = 500;
+const CLICK_DEBOUNCE_TIME = 10;
 
 const COLORS = {
   RED:      '#FD5061',
@@ -113,19 +114,16 @@ async function createBurst(x, y) {
 }
 
 function drawCrossHair(x, y) {
-    const crossHair = new mojs.Shape({
-      shape:        'circle',     // shape 'circle' is default
-      radius:       25,           // shape radius
-      fill:         'transparent',// same as 'transparent'
-      stroke:       '#F64040',    // or 'cyan'
-      strokeWidth:  5,            // width of the stroke
-      isShowStart:  true,         // show before any animation starts
-    })
-    .tune({ x: x, y: y })
-    .play();
-}
+  context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+ 
+  context.beginPath();
+  context.arc(x, y,50, 0, 2 * Math.PI, true);
+  context.strokeStyle = "#FF6A6A";
+  context.lineWidth= 10;
+  context.stroke();
+}  
 
-async function handleBurstEvent() {
+async function createRandomBurst() {
   const maxWidth = document.documentElement.clientWidth
   const maxHeight = document.documentElement.clientHeight
 
@@ -140,6 +138,12 @@ var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
 var keysPressed = [];
 var buttonsPressed = [];
+var clickDown = [];
+var mousePosition = {x: 100, y: 100};
+var canvas = document.querySelector("#canvas")
+var context = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 function connecthandler(e) {
   controllers[e.gamepad.index] = e.gamepad;
@@ -196,9 +200,7 @@ function handleControllerInput() {
         registerButtonDown(i)
       }
     }
-    (async () => {
-      drawCrossHair(controller.axes[0].toFixed(4), controller.axes[1].toFixed(4))
-    })();
+    drawCrossHair(controller.axes[0].toFixed(4), controller.axes[1].toFixed(4));
     
   }
 
@@ -207,12 +209,28 @@ function handleControllerInput() {
       if(!buttonsPressed[index].inCoolDown) {
         buttonsPressed[index].inCoolDown = true;
         setTimeout(() => delete buttonsPressed[index], BUTTON_DEBOUNCE_TIME);
-        await handleBurstEvent();
+        // await createRandomBurst();
+        await createBurst(mousePosition.x, mousePosition.y);
       }
     });
 
 }
 
+function registerMousePosition(e) {
+  mousePosition = {
+    x: e.clientX,
+    y: e.clientY,
+  }
+}
+function registerMouseClick() {
+  if (clickDown.length == 0) {
+    clickDown = [
+      {
+        inCoolDown: false
+      }
+    ];
+  }
+}
 function registerKeyDown(e) {
   if (!(e.key in keysPressed)) {
     keysPressed = {
@@ -229,14 +247,24 @@ function handleKeyboardInput() {
       if(!keysPressed[key].inCoolDown) {
         keysPressed[key].inCoolDown = true;
         setTimeout(() => delete keysPressed[key], KEYBOARD_DEBOUNCE_TIME);
-        await handleBurstEvent();
+        await createRandomBurst();
       }
     });
+}
+function handleMouseInput() {
+  clickDown.forEach(async (key) => {
+    if(!clickDown[0].inCoolDown) {
+      clickDown[0].inCoolDown = true;
+      setTimeout(() => clickDown = [], CLICK_DEBOUNCE_TIME);
+      await createBurst(mousePosition.x, mousePosition.y);
+    }
+  });
 }
 
 function handleInput() {
   handleControllerInput();
   handleKeyboardInput();
+  handleMouseInput();
 }
 
 function frameLoop() {
@@ -244,6 +272,10 @@ function frameLoop() {
     scangamepads();
   }
   handleInput();
+  drawCrossHair(mousePosition.x, mousePosition.y);
+  
+
+  // console.log(mousePosition.x, mousePosition.y);
   requestAnimationFrame(frameLoop);
   
 }
@@ -252,8 +284,9 @@ if (!haveEvents) {
   setInterval(scangamepads, 500);
 }
 
-document.addEventListener("keydown", (e) => registerKeyDown(e));
+document.addEventListener("keydown", registerKeyDown);
 window.addEventListener("gamepadconnected", connecthandler);
 window.addEventListener("gamepaddisconnected", disconnecthandler);
-
+document.addEventListener('mousemove', registerMousePosition);
+document.addEventListener('click', registerMouseClick);
 startAnimation();
