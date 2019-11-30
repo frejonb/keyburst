@@ -70,8 +70,8 @@ class Controller {
                     buttonsPressed[index].inCoolDown = true;
                     setTimeout(() => delete buttonsPressed[index], BUTTON_DEBOUNCE_TIME);
                     await action(
-                        ( 1 + controller.axes[0].toFixed(4) ) * document.documentElement.clientWidth / 2,
-                        ( 1 + controller.axes[1].toFixed(4) ) * document.documentElement.clientHeight / 2,
+                        ( 1 + controller.axes[0].toFixed(4) ) * window.innerWidth / 2,
+                        ( 1 + controller.axes[1].toFixed(4) ) * window.innerHeight / 2,
                     );;
                 }
             });
@@ -89,8 +89,8 @@ class Controller {
             console.log(controller.axes[0].toFixed(4));
             console.log(controller.axes[1].toFixed(4));
             action(
-                ( 1 + controller.axes[0].toFixed(4) ) * document.documentElement.clientWidth / 2,
-                ( 1 + controller.axes[1].toFixed(4) ) * document.documentElement.clientHeight / 2,
+                ( 1 + controller.axes[0].toFixed(4) ) * window.innerWidth / 2,
+                ( 1 + controller.axes[1].toFixed(4) ) * window.innerHeight / 2,
             );
         }
     }
