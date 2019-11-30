@@ -9,8 +9,8 @@ function startAnimation() {
 }
 
 function handleInput() {
-  controller.handleButtonInput(() => animation.createBurst());
-  controller.handleStickInput(() => animation.drawCrossHair());
+  controller.handleButtonInput((x, y) => animation.createBurst(x, y));
+  controller.handleStickInput((x, y) => animation.drawCrossHair(x, y));
   keyboard.handleKeyboardInput(() => animation.createRandomBurst());
   mouse.handleMouseInput(animation.createBurst);
   mouse.handleMouseMovement(animation.drawCrossHair);
