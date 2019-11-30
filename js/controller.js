@@ -86,7 +86,7 @@ class Controller {
 
         for (j in controllers) {
             var controller = controllers[j];
-            console.log( (1.0 + Number.parseFloat(controller.axes[0]).toFixed(4) ) );
+            console.log( (1.0 + Number.parseFloat(controller.axes[0])) );
             console.log( window.innerWidth );
             action(
                 ( 1.0 + controller.axes[0] ) * window.innerWidth * 0.5,
