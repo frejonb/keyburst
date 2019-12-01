@@ -64,17 +64,17 @@ class Controller {
             }
         }
 
+        var buttons = []
         Object.keys(buttonsPressed)
-            .forEach(async (index) => {
+            .forEach((index) => {
                 if (!buttonsPressed[index].inCoolDown) {
                     buttonsPressed[index].inCoolDown = true;
                     setTimeout(() => delete buttonsPressed[index], BUTTON_DEBOUNCE_TIME);
-                    await action(
-                        ( 1.0 + controller.axes[0] ) * window.innerWidth * 0.5,
-                        ( 1.0 + controller.axes[1] ) * window.innerHeight * 0.5,
-                    );
+                    buttons.push(action(index));
                 }
             });
+
+        return buttons;
     }
 
     handleStickInput(action) {
@@ -84,12 +84,15 @@ class Controller {
         var i = 0;
         var j;
 
+        var axisCoords = []
         for (j in controllers) {
             var controller = controllers[j];
-            action(
+            axesCoords.push(action(
                 ( 1.0 + controller.axes[0] ) * window.innerWidth * 0.5,
                 ( 1.0 + controller.axes[1] ) * window.innerHeight * 0.5,
-            );
+            ));
         }
+
+        return axisCoords;
     }
 }
