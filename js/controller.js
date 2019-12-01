@@ -87,7 +87,7 @@ class Controller {
         var axisCoords = []
         for (j in controllers) {
             var controller = controllers[j];
-            axesCoords.push(action(
+            axisCoords.push(action(
                 ( 1.0 + controller.axes[0] ) * window.innerWidth * 0.5,
                 ( 1.0 + controller.axes[1] ) * window.innerHeight * 0.5,
             ));
