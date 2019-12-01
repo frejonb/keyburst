@@ -196,28 +196,45 @@ class Animation {
     }
 
     drawMovingStar(x, y, updateState, active) {
+        const maxWidth = document.documentElement.clientWidth
+        const maxHeight = document.documentElement.clientHeight
         let currentX = x;
         let currentY = y;
+        let deltaX = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
+        let deltaY = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
+        let newX, newY;
+        if (currentX + deltaX >= maxWidth) {
+            newX = currentX - deltaX;
+        } else {
+            newX = currentX + deltaX;
+        }
+        if (currentY + deltaY >= maxHeight) {
+            newY = currentY - deltaY;
+        } else {
+            newY = currentY + deltaY;
+        }
+
         const star = new mojs.Shape({
                 left: 0, top: 0,
                 shape: 'star',
-                // isShowStart: true,
                 fill: '#FF9C00',
                 // scale: { 0: 1 },
-                // easing: 'elastic.out',
+                easing: 'ease.in',
                 // duration: 160,
                 // delay: 0,
                 radius: RADIUS_STAR / 2.35,
+                // isYoyo: true,
                 onComplete() {
+                    console.log("|asdfsd")
                     if (!active()) {
                         star.el.parentNode.removeChild(star.el);
                         return;
                     }
-                    const maxWidth = document.documentElement.clientWidth
-                    const maxHeight = document.documentElement.clientHeight
-                    const deltaX = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
-                    const deltaY = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
-                    let newX, newY;
+                    currentX = newX;
+                    currentY = newY;
+                    deltaX = Math.floor((2 * (Math.random() - 0.5) * 0.2 * RADIUS_STAR));
+                    deltaY = Math.floor((2 * (Math.random() - 0.5) * 0.2 * RADIUS_STAR));
+
                     if (currentX + deltaX >= maxWidth) {
                         newX = currentX - deltaX;
                     } else {
@@ -228,13 +245,10 @@ class Animation {
                     } else {
                         newY = currentY + deltaY;
                     }
-
                     updateState(newX, newY)
-                    star.tune({x: newX, y: newY}).replay();
-                    currentX = newX;
-                    currentY = newY;
+                    star.tune({x: {[currentX]: newX}, y: {[currentY]: newY}}).replay();
                 },
-            }).tune({x: currentX, y: currentY}).replay();
+            }).tune({x: {[currentX]: newX}, y: {[currentY]: newY}}).replay();
         return star;
     }
 
