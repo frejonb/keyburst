@@ -51,9 +51,9 @@ function triggerBurst(inputData) {
     });
   }
   if (inputData.buttonsPressed.length > 0) {
-    inputData.buttonsPressed.forEach((coord) => {
-      animation.createBurst(coord.x, coord.y);
-      burstCoords.push({x: coord.x, y: coord.y})
+    inputData.buttonsPressed.forEach((button) => {
+      animation.createBurst(inputData.axisCoords[0].x, inputData.axisCoords[0].y);
+      burstCoords.push({x: inputData.axisCoords[0].x, y: inputData.axisCoords[0].y})
     });
   }
 
