@@ -1,4 +1,4 @@
-const RADIUS_STAR = 28;
+const RADIUS_STAR = 100;
 
 const COLORS = {
     RED: '#FD5061',
@@ -195,21 +195,30 @@ class Animation {
         context.stroke();
     }
 
-    drawStar(x, y) {
-        const star = new mojs.Shape({
-            left: 0, top: 0,
-            shape: 'star',
-            fill: '#FF9C00',
-            scale: { 0: 1 },
-            easing: 'elastic.out',
-            duration: 1600,
-            delay: 300,
-            radius: RADIUS_STAR / 2.35,
-            onComplete() {
-                star.el.parentNode.removeChild(star.el);
-            },
-        }).tune({ x: x, y: y })
-            .generate()
-            .replay();
+    async drawMovingStar(x, y) {
+        await new Promise(resolve => {
+            const star = new mojs.Shape({
+                left: 0, top: 0,
+                shape: 'star',
+                isShowStart: true,
+                fill: '#FF9C00',
+                // scale: { 0: 1 },
+                // easing: 'elastic.out',
+                // duration: 16000,
+                delay: 0,
+                radius: RADIUS_STAR / 2.35,
+                onComplete() {
+                    const maxWidth = document.documentElement.clientWidth
+                    const maxHeight = document.documentElement.clientHeight
+
+                    var x = Math.floor((Math.random() * maxWidth) + 1);
+                    var y = Math.floor((Math.random() * maxHeight) + 1);
+                    star.tune({x: x, y: y}).replay();
+                },
+            }).tune({x: x, y: y}).replay();
+            console.log(star)
+        });
     }
+
+
 }

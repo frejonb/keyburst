@@ -2,9 +2,13 @@ var mouse = new Mouse();
 var keyboard = new Keyboard();
 var controller = new Controller();
 var animation = new Animation();
+var targets = {};
 
 
 function startAnimation() {
+  const coord = animation.generateRandomCoordinateOnScreen();
+  targets = coord;
+  (async () => await animation.drawMovingStar(coord.x, coord.y))();
   requestAnimationFrame(frameLoop);
 }
 
@@ -57,9 +61,8 @@ function triggerBurst(inputData) {
 }
 
 function updateTarget(burstCoords) {
-  animation.drawStar(100, 100);
 
-  const hit = burstCoords.filter((coord) => (coord.x - 100) * (coord.x - 100) + (coord.y - 100) * (coord.y - 100) <= 100*100);
+  const hit = burstCoords.filter((coord) => (coord.x - 100) * (coord.x - 100) + (coord.y - 100) * (coord.y - 100) <= RADIUS_STAR*RADIUS_STAR);
 
   if (hit.length > 0) {
     animation.createStarBurst(100, 100)
@@ -75,7 +78,6 @@ function handleFrameUpdate(inputData) {
 
 function frameLoop() {
   const inputData = handleInput();
-  console.log(JSON.stringify(inputData, null, 2));
   handleFrameUpdate(inputData);
   requestAnimationFrame(frameLoop);
 }
