@@ -9,15 +9,26 @@ function startAnimation() {
 }
 
 function handleInput() {
-  keyboard.handleKeyboardInput(() => animation.createRandomBurst());
-  mouse.handleMouseInput(animation.createBurst);
-  mouse.handleMouseMovement(animation.drawCrossHair);
-  controller.handleButtonInput((x, y) => animation.createBurst(x, y));
-  controller.handleStickInput(animation.drawCrossHair);
+  var keyboardCoords = keyboard.handleKeyboardInput((key) => animation.generateRandomCoordinateOnScreen());
+  var mouseClicked = mouse.handleMouseInput((button) => button);
+  var mouseCoords = mouse.handleMouseMovement((x, y) => ({x: x, y: y}));
+  var buttonsPressed = controller.handleButtonInput((button) => button);
+  var axisCoords = controller.handleStickInput((x, y) => ({x: x, y: y}));
+
+  console.log(`keyboard coords: ${JSON.stringify(keyboardCoords)}`);
+  console.log(`mouse button clicked: ${JSON.stringify(mouseClicked)}`);
+  console.log(`mouse coords: ${JSON.stringify(mouseCoords)}`);
+  console.log(`buttons pressed: ${JSON.stringify(buttonsPressed)}`);
+  console.log(`axis coords: ${JSON.stringify(axisCoords)}`);
+}
+
+function handleFrameUpdate() {
+  animation.drawStar(100, 100);
 }
 
 function frameLoop() {
   handleInput();
+  handleFrameUpdate();
   requestAnimationFrame(frameLoop);
 }
 
