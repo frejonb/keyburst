@@ -1,4 +1,4 @@
-const BUTTON_DEBOUNCE_TIME = 500;
+const BUTTON_DEBOUNCE_TIME = 100;
 var haveEvents = 'ongamepadconnected' in window;
 buttonsPressed = [];
 controllers = {};
