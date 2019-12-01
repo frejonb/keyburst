@@ -85,7 +85,6 @@ function updateTarget(burstCoords) {
     if (hit.length > 0) {
       animation.createStarBurst(target.coord.x, target.coord.y);
       targets[idx].active = false;
-      console.log(JSON.stringify(targets, null, 2));
     }
   });
 
