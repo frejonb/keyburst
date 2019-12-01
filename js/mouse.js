@@ -22,17 +22,20 @@ class Mouse {
     }
 
     handleMouseInput(action) {
-        clickDown.forEach(async (key) => {
+        const buttons = []
+        clickDown.forEach((element, idx) => {
             if (!clickDown[0].inCoolDown) {
                 clickDown[0].inCoolDown = true;
                 setTimeout(() => clickDown = [], CLICK_DEBOUNCE_TIME);
-                await action(mousePosition.x, mousePosition.y);
+                buttons.push(action(idx));
             }
         });
+
+        return buttons;
     }
 
     handleMouseMovement(action) {
-        action(mousePosition.x, mousePosition.y);
+        return action(mousePosition.x, mousePosition.y);
     }
 }
 
