@@ -1,8 +1,11 @@
 # keyburst
 
-![](keyburst.gif)
+# Changelog
 
-## Features
-- Random burst on key press
-- Crosshair follows mouse and bursts on click
-- Crosshair follows gamepad controller and bursts on button click
+## v2.0
+- 🖱 Crosshair follows mouse and bursts on click 
+- 🎮 Crosshair follows gamepad controller and bursts on button click 
+
+## v1.0
+![](keyburst.gif)
+- ⌨️ Random burst on key press
