@@ -195,30 +195,47 @@ class Animation {
         context.stroke();
     }
 
-    async drawMovingStar(x, y) {
-        await new Promise(resolve => {
-            const star = new mojs.Shape({
+    drawMovingStar(x, y, updateState, active) {
+        let currentX = x;
+        let currentY = y;
+        const star = new mojs.Shape({
                 left: 0, top: 0,
                 shape: 'star',
-                isShowStart: true,
+                // isShowStart: true,
                 fill: '#FF9C00',
                 // scale: { 0: 1 },
                 // easing: 'elastic.out',
-                // duration: 16000,
-                delay: 0,
+                // duration: 160,
+                // delay: 0,
                 radius: RADIUS_STAR / 2.35,
                 onComplete() {
+                    if (!active()) {
+                        star.el.parentNode.removeChild(star.el);
+                        return;
+                    }
                     const maxWidth = document.documentElement.clientWidth
                     const maxHeight = document.documentElement.clientHeight
+                    const deltaX = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
+                    const deltaY = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
+                    let newX, newY;
+                    if (currentX + deltaX >= maxWidth) {
+                        newX = currentX - deltaX;
+                    } else {
+                        newX = currentX + deltaX;
+                    }
+                    if (currentY + deltaY >= maxHeight) {
+                        newY = currentY - deltaY;
+                    } else {
+                        newY = currentY + deltaY;
+                    }
 
-                    var x = Math.floor((Math.random() * maxWidth) + 1);
-                    var y = Math.floor((Math.random() * maxHeight) + 1);
-                    star.tune({x: x, y: y}).replay();
+                    updateState(newX, newY)
+                    star.tune({x: newX, y: newY}).replay();
+                    currentX = newX;
+                    currentY = newY;
                 },
-            }).tune({x: x, y: y}).replay();
-            console.log(star)
-        });
+            }).tune({x: currentX, y: currentY}).replay();
+        return star;
     }
-
 
 }
