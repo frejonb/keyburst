@@ -15,13 +15,16 @@ class Keyboard {
     }
 
     handleKeyboardInput(action) {
+        const coords = []
         Object.keys(keysPressed)
-            .forEach(async (key) => {
+            .forEach((key) => {
                 if (!keysPressed[key].inCoolDown) {
                     keysPressed[key].inCoolDown = true;
                     setTimeout(() => delete keysPressed[key], KEYBOARD_DEBOUNCE_TIME);
-                    await action();
+                    coords.push(action(key));
                 }
             });
+
+        return coords;
     }
 }
