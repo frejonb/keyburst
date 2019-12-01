@@ -130,9 +130,19 @@ class Animation {
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     
         context.beginPath();
-        context.arc(x, y, 50, 0, 2 * Math.PI, true);
         context.strokeStyle = "#FF6A6A";
-        context.lineWidth = 10;
+        context.lineWidth = 1;
+        context.setLineDash([5, 5]);
+        context.moveTo(x - 50, y);
+        context.lineTo(x + 50, y);
+        context.moveTo(x, y - 50);
+        context.lineTo(x, y + 50);
+        context.stroke();
+
+        context.beginPath();
+        context.lineWidth = 2;
+        context.setLineDash([]);
+        context.arc(x, y, 20, 0, 2 * Math.PI, true);
         context.stroke();
     }
 }
