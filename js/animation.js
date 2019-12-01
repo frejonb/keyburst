@@ -225,7 +225,6 @@ class Animation {
                 radius: RADIUS_STAR / 2.35,
                 // isYoyo: true,
                 onComplete() {
-                    console.log("|asdfsd")
                     if (!active()) {
                         star.el.parentNode.removeChild(star.el);
                         return;
