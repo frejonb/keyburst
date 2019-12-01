@@ -9,26 +9,74 @@ function startAnimation() {
 }
 
 function handleInput() {
-  var keyboardCoords = keyboard.handleKeyboardInput((key) => animation.generateRandomCoordinateOnScreen());
-  var mouseClicked = mouse.handleMouseInput((button) => button);
-  var mouseCoords = mouse.handleMouseMovement((x, y) => ({x: x, y: y}));
-  var buttonsPressed = controller.handleButtonInput((button) => button);
-  var axisCoords = controller.handleStickInput((x, y) => ({x: x, y: y}));
+  const keyboardCoords = keyboard.handleKeyboardInput((key) => animation.generateRandomCoordinateOnScreen());
+  const mouseClicked = mouse.handleMouseInput((button) => button);
+  const mouseCoords = mouse.handleMouseMovement((x, y) => ({x: x, y: y}));
+  const buttonsPressed = controller.handleButtonInput((button) => button);
+  const axisCoords = controller.handleStickInput((x, y) => ({x: x, y: y}));
 
-  console.log(`keyboard coords: ${JSON.stringify(keyboardCoords)}`);
-  console.log(`mouse button clicked: ${JSON.stringify(mouseClicked)}`);
-  console.log(`mouse coords: ${JSON.stringify(mouseCoords)}`);
-  console.log(`buttons pressed: ${JSON.stringify(buttonsPressed)}`);
-  console.log(`axis coords: ${JSON.stringify(axisCoords)}`);
+  return {
+    keyboardCoords: keyboardCoords,
+    mouseClicked: mouseClicked,
+    mouseCoords: mouseCoords,
+    buttonsPressed: buttonsPressed,
+    axisCoords: axisCoords,
+  }
+
 }
 
-function handleFrameUpdate() {
+function updateCrossHair(inputData) {
+  animation.drawCrossHair(inputData.mouseCoords.x, inputData.mouseCoords.y);
+  if (inputData.axisCoords.length !== 0) {
+    animation.drawCrossHair(inputData.axisCoords[0].x, inputData.axisCoords[0].y);
+  }
+}
+
+function triggerBurst(inputData) {
+  const burstCoords = []
+  if (inputData.mouseClicked.length > 0) {
+    inputData.mouseClicked.forEach((button) => {
+      animation.createBurst(inputData.mouseCoords.x, inputData.mouseCoords.y);
+      burstCoords.push({x: inputData.mouseCoords.x, y: inputData.mouseCoords.y})
+    });
+  }
+  if (inputData.keyboardCoords.length > 0) {
+    inputData.keyboardCoords.forEach((coord) => {
+      animation.createBurst(coord.x, coord.y);
+      burstCoords.push({x: coord.x, y: coord.y})
+    });
+  }
+  if (inputData.buttonsPressed.length > 0) {
+    inputData.buttonsPressed.forEach((coord) => {
+      animation.createBurst(coord.x, coord.y);
+      burstCoords.push({x: coord.x, y: coord.y})
+    });
+  }
+
+  return burstCoords;
+}
+
+function updateTarget(burstCoords) {
   animation.drawStar(100, 100);
+
+  const hit = burstCoords.filter((coord) => (coord.x - 100) * (coord.x - 100) + (coord.y - 100) * (coord.y - 100) <= 100*100);
+
+  if (hit.length > 0) {
+    animation.createStarBurst(100, 100)
+  }
+
+}
+
+function handleFrameUpdate(inputData) {
+  updateCrossHair(inputData);
+  burstCoords = triggerBurst(inputData);
+  updateTarget(burstCoords);
 }
 
 function frameLoop() {
-  handleInput();
-  handleFrameUpdate();
+  const inputData = handleInput();
+  console.log(JSON.stringify(inputData, null, 2));
+  handleFrameUpdate(inputData);
   requestAnimationFrame(frameLoop);
 }
 
