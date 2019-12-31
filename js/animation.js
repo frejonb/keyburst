@@ -195,59 +195,48 @@ class Animation {
         context.stroke();
     }
 
-    drawMovingStar(x, y, updateState, active) {
-        const maxWidth = document.documentElement.clientWidth
-        const maxHeight = document.documentElement.clientHeight
-        let currentX = x;
-        let currentY = y;
-        let deltaX = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
-        let deltaY = Math.floor((2 * (Math.random() - 0.5) * 0.1 * RADIUS_STAR));
-        let newX, newY;
-        if (currentX + deltaX >= maxWidth) {
-            newX = currentX - deltaX;
-        } else {
-            newX = currentX + deltaX;
+    drawMovingStar(x, y) {
+        const genNewCoords = () => {
+            const maxWidth = document.documentElement.clientWidth
+            const maxHeight = document.documentElement.clientHeight
+    
+            var x = Math.floor((Math.random() * maxWidth) + 1);
+            var y = Math.floor((Math.random() * maxHeight) + 1);
+            return {x: x, y: y};
         }
-        if (currentY + deltaY >= maxHeight) {
-            newY = currentY - deltaY;
-        } else {
-            newY = currentY + deltaY;
-        }
+        const newCoords = genNewCoords();
+        const newX = newCoords.x;
+        const newY = newCoords.y;
 
-        const star = new mojs.Shape({
+        const star = new mojs.ShapeSwirl({
                 left: 0, top: 0,
                 shape: 'star',
                 fill: '#FF9C00',
-                // scale: { 0: 1 },
-                easing: 'ease.in',
-                // duration: 160,
-                // delay: 0,
+                scale: { 1: 1 },
+                easing: 'linear.none',
+                duration: 2600,
                 radius: RADIUS_STAR / 2.35,
-                // isYoyo: true,
-                onComplete() {
-                    if (!active()) {
-                        star.el.parentNode.removeChild(star.el);
-                        return;
-                    }
-                    currentX = newX;
-                    currentY = newY;
-                    deltaX = Math.floor((2 * (Math.random() - 0.5) * 0.2 * RADIUS_STAR));
-                    deltaY = Math.floor((2 * (Math.random() - 0.5) * 0.2 * RADIUS_STAR));
-
-                    if (currentX + deltaX >= maxWidth) {
-                        newX = currentX - deltaX;
-                    } else {
-                        newX = currentX + deltaX;
-                    }
-                    if (currentY + deltaY >= maxHeight) {
-                        newY = currentY - deltaY;
-                    } else {
-                        newY = currentY + deltaY;
-                    }
-                    updateState(newX, newY)
-                    star.tune({x: {[currentX]: newX}, y: {[currentY]: newY}}).replay();
+                onPlaybackStop() {
+                    star.el.parentNode.removeChild(star.el);
+                    return; 
                 },
-            }).tune({x: {[currentX]: newX}, y: {[currentY]: newY}}).replay();
+                onComplete() {
+                    // by default the engine will hide the shape then apply new options and then show the shape
+                    // to prevent that replace the hide method with placeholder function
+                    const hide = star._hide;
+                    star._hide = () => {};
+                    const x = star._props.x;
+                    const y = star._props.y;
+                    const newCoords = genNewCoords();
+                    const newX = newCoords.x;
+                    const newY = newCoords.y;
+                    star
+                        .pause()
+                        .tune({x: {[x]: newX}, y: {[y]: newY}, duration: 2600})
+                        .replay();
+                    star._hide = hide;
+                },
+            }).tune({x: {[x]: newX}, y: {[y]: newY}}).replay();
         return star;
     }
 

@@ -64,27 +64,26 @@ function updateTarget(burstCoords) {
     if (r > 0.99) {
       var idx = targets.length;
       targets[idx] = {};
-      targets[idx].coord = animation.generateRandomCoordinateOnScreen();
+      initCoords = animation.generateRandomCoordinateOnScreen();
       targets[idx].active = true;
-      animation.drawMovingStar(
-          targets[idx].coord.x,
-          targets[idx].coord.y,
-          (newX, newY) => {
-            targets[idx].coord = { x: newX, y: newY }
-          },
-          () => targets[idx].active,
+        targets[idx].obj = animation.drawMovingStar(
+          initCoords.x,
+          initCoords.y
         );
     }
   }
-
   targets.forEach((target, idx) => {
     if (!target.active) {
       return;
     }
-    const hit = burstCoords.filter((coord) => (coord.x - target.coord.x) * (coord.x - target.coord.x) + (coord.y - target.coord.y) * (coord.y - target.coord.y) <= RADIUS_STAR * RADIUS_STAR);
+    const {x, y} = target.obj._props;
+    objCoordX = parseInt(x, 10)
+    objCoordY = parseInt(y, 10)
+    const hit = burstCoords.filter((coord) => (coord.x - objCoordX) * (coord.x - objCoordX) + (coord.y - objCoordY) * (coord.y - objCoordY) <= RADIUS_STAR * RADIUS_STAR);
     if (hit.length > 0) {
-      animation.createStarBurst(target.coord.x, target.coord.y);
+      animation.createStarBurst(objCoordX, objCoordY);
       targets[idx].active = false;
+      targets[idx].obj.stop()
     }
   });
 
