@@ -2,6 +2,10 @@
 
 # Changelog
 
+## v3.0
+![](keyburstv3.gif)
+- 🌟 Added randomly moving targets
+
 ## v2.0
 ![](keyburstv2.gif)
 - 🖱 Crosshair follows mouse and bursts on click 
