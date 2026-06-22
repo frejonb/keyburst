@@ -12,6 +12,7 @@ function rescale(){
 function startGame(){
   document.getElementById("title").classList.remove("show");
   game.state=STATE.OVERWORLD;
+  audioStart(); setMusic("field");
   showDialog(STORY_INTRO);
 }
 
@@ -28,6 +29,7 @@ function checkVictory(){
 // ---- touch / click controls ----
 function pressContext(){
   if(game.state===STATE.TITLE)   { startGame(); return; }
+  if(game.state===STATE.MENU)    { closeMenu(); return; }
   if(game.state===STATE.EVOLVE)  { dismissEvolution(); return; }
   if(game.state===STATE.DIALOG||game.state===STATE.CUTSCENE){ advanceDialog(); return; }
   if(game.state===STATE.OVERWORLD){ interact(); return; }
@@ -54,11 +56,22 @@ function setupTouch(){
 
   document.getElementById("title").addEventListener("click", ()=>{ if(game.state===STATE.TITLE) startGame(); });
   document.getElementById("dialog").addEventListener("click", ()=>{ if(game.state===STATE.DIALOG||game.state===STATE.CUTSCENE) advanceDialog(); });
+
+  // MENU / BAG button
+  const mb=document.getElementById("menuBtn");
+  const mbFire=e=>{ e.preventDefault(); toggleMenu(); };
+  mb.addEventListener("touchstart",mbFire,{passive:false}); mb.addEventListener("mousedown",mbFire);
+  // close button inside menu
+  document.getElementById("menuClose").addEventListener("click", closeMenu);
+  // mute
+  document.getElementById("muteBtn").addEventListener("click", ()=>{ audioStart(); toggleMute(); });
 }
 
 function syncDpad(){
   const hide = game.state===STATE.BATTLE||game.state===STATE.EVOLVE;
   document.getElementById("dpad").style.display = hide?"none":"flex";
+  const mb=document.getElementById("menuBtn");
+  if(mb) mb.style.display = (game.state===STATE.OVERWORLD||game.state===STATE.MENU)?"":"none";
 }
 setInterval(syncDpad,150);
 

@@ -39,6 +39,7 @@ function beginBattle(enemy, trainer, enemyParty){
 
   game.state=STATE.BATTLE;
   battleEl.classList.add("show");
+  if(typeof setMusic==="function") setMusic("battle");
 
   banim.enemyIn=0; banim.playerIn=0; banim.enemyDX=0; banim.playerDX=0;
   banim.enemyDY=0; banim.playerDY=0; banim.enemyFlash=0; banim.playerFlash=0;
@@ -218,7 +219,15 @@ function onEnemyFainted(){
 
   const msgs=[`${battle.enemy.name} fainted!`, `${battle.player.name} gained ${expGained} EXP!`];
   if(leveled) msgs.push(`${battle.player.name} grew to Lv.${battle.player.level}!`);
+  // wild Plitshon leave an egg behind
+  let droppedEgg=false;
+  if(!isTrainer){
+    droppedEgg=true;
+    msgs.push(`The fainted ${battle.enemy.name} left behind an EGG!`,"Walk with it and it will hatch into a friend.");
+  }
+  const eggSpecies=battle.enemy.speciesId, eggLevel=battle.enemy.level;
   afterBattleDialog(msgs, ()=>{
+    if(droppedEgg) addEgg(eggSpecies, eggLevel);
     if(isTrainer){
       battle.trainer.defeated=true; game.alertTrainer=null;
       showDialog([battle.trainer.post], ()=> willEvo?doEvolution():endBattleReturn());
@@ -229,10 +238,10 @@ function onEnemyFainted(){
 }
 
 function onPlayerFainted(){
-  afterBattleDialog([`${battle.player.name} fainted!`,"You scurry back to safety..."], ()=>{
-    for(const p of game.party){ p.hp=Math.max(1,Math.floor(p.maxHp*0.5)); p.def=p.baseDef; }
-    // return to town centre
-    const gp=game.player; gp.tx=16; gp.ty=11; gp.px=16*TILE; gp.py=11*TILE; gp.dir=2; gp.moving=false;
+  afterBattleDialog([`${battle.player.name} fainted!`,"You black out... and wake at the DOCTOR CENTER.","Nurse Tineke: You're safe now. All healed up!"], ()=>{
+    healParty();
+    const gp=game.player; gp.tx=game.lastHeal.x; gp.ty=game.lastHeal.y;
+    gp.px=gp.tx*TILE; gp.py=gp.ty*TILE; gp.dir=2; gp.moving=false;
     endBattleReturn();
   });
 }
@@ -250,6 +259,7 @@ function endBattleReturn(){
   battleEl.classList.remove("show");
   game.state=STATE.OVERWORLD; game.alertTrainer=null;
   banim.running=false;
+  if(typeof setMusic==="function") setMusic("field");
   updateHUD();
-  if(TRAINERS.every(t=>t.defeated)) checkVictory();
+  if(TRAINERS.every(t=>t.defeated)){ if(typeof victorySting==="function") victorySting(); checkVictory(); }
 }
