@@ -1,101 +1,88 @@
-// Entry point: responsive scaling, touch d-pad, story, victory
+// ============================================================
+//  MAIN — title, scaling, touch controls, victory, boot
+// ============================================================
 
-// ---- Responsive scaling ----
-function rescale() {
+function rescale(){
   const scale = window.innerWidth / 640;
-  const stage = document.getElementById("stage");
-  const wrap  = document.getElementById("stageWrap");
-  stage.style.transform = `scale(${scale})`;
-  wrap.style.height = Math.ceil(480 * scale) + "px";
+  const stage=document.getElementById("stage"), wrap=document.getElementById("stageWrap");
+  stage.style.transform=`scale(${scale})`;
+  wrap.style.height=Math.ceil(480*scale)+"px";
 }
 
-// ---- HUD goal tracker ----
-function updateGoal() {
-  const defeated = TRAINERS.filter(t => t.defeated).length;
-  const el = document.getElementById("hudGoal");
-  el.textContent = `TRAINERS: ${defeated}/3`;
-  el.classList.toggle("done", defeated === 3);
+function startGame(){
+  document.getElementById("title").classList.remove("show");
+  game.state=STATE.OVERWORLD;
+  showDialog(STORY_INTRO);
 }
 
-// ---- Victory ----
-function checkVictory() {
-  if (!TRAINERS.every(t => t.defeated)) return;
+function checkVictory(){
+  if(!TRAINERS.every(t=>t.defeated)) return;
   showDialog([
-    "The three signal towers crackle back to life!",
-    "YOU ARE THE PLITSHON CHAMPION!\nThe Grid thanks you, Trainer.",
+    "The three trainers tip their caps to you.",
+    "Word spreads across every polder and canal...",
+    "YOU ARE THE TULIPA REGION CHAMPION!",
+    "Professor van Dijk: And to think it began with one lonely Truk. Gefeliciteerd!",
   ]);
 }
 
-// ---- D-pad setup ----
-function setupDpad() {
-  document.querySelectorAll(".dpad-btn[data-dir]").forEach(btn => {
-    const dir = parseInt(btn.dataset.dir);
-
-    const fire = e => {
-      e.preventDefault();
-      if (game.state === STATE.OVERWORLD) tryMove(dir);
-    };
-    btn.addEventListener("touchstart", fire, { passive: false });
-    btn.addEventListener("mousedown",  fire);
-  });
-
-  const centre = document.getElementById("dpad-action");
-  const confirm = e => {
-    e.preventDefault();
-    if (game.state === STATE.EVOLVE)  { dismissEvolution(); return; }
-    if (game.state === STATE.DIALOG)  { advanceDialog();    return; }
-    if (game.state === STATE.BATTLE && battle.phase === BattlePhase.SELECT) {
-      if (battle.selIndex === 4) doFlee();
-      else {
-        const mv = battle.player.moves[battle.selIndex];
-        if (mv && mv.pp > 0) playerMove(battle.selIndex);
-      }
-    }
-  };
-  centre.addEventListener("touchstart", confirm, { passive: false });
-  centre.addEventListener("mousedown",  confirm);
-
-  // Tap dialog to advance
-  document.getElementById("dialog").addEventListener("click", () => {
-    if (game.state === STATE.DIALOG) advanceDialog();
-  });
+// ---- touch / click controls ----
+function pressContext(){
+  if(game.state===STATE.TITLE)   { startGame(); return; }
+  if(game.state===STATE.EVOLVE)  { dismissEvolution(); return; }
+  if(game.state===STATE.DIALOG||game.state===STATE.CUTSCENE){ advanceDialog(); return; }
+  if(game.state===STATE.OVERWORLD){ interact(); return; }
+  if(game.state===STATE.BATTLE && battle.phase===BattlePhase.SELECT){
+    if(battle.selIndex===4) doFlee();
+    else { const mv=battle.player.moves[battle.selIndex]; if(mv&&mv.pp>0) playerMove(battle.selIndex); }
+  }
 }
 
-// Hide/show d-pad based on state
-function syncDpad() {
-  const hidden = game.state === STATE.BATTLE || game.state === STATE.EVOLVE;
-  document.getElementById("dpad").style.display = hidden ? "none" : "flex";
+function setupTouch(){
+  document.querySelectorAll(".dpad-btn[data-dir]").forEach(btn=>{
+    const dir=+btn.dataset.dir;
+    let held=false;
+    const down=e=>{ e.preventDefault(); held=true; const step=()=>{ if(!held)return; if(game.state===STATE.OVERWORLD) requestMove(dir); setTimeout(step,90); }; step(); };
+    const up=e=>{ held=false; };
+    btn.addEventListener("touchstart",down,{passive:false});
+    btn.addEventListener("touchend",up); btn.addEventListener("touchcancel",up);
+    btn.addEventListener("mousedown",down); window.addEventListener("mouseup",up);
+  });
+  const ok=document.getElementById("dpad-action");
+  const okFire=e=>{ e.preventDefault(); pressContext(); };
+  ok.addEventListener("touchstart",okFire,{passive:false});
+  ok.addEventListener("mousedown",okFire);
+
+  document.getElementById("title").addEventListener("click", ()=>{ if(game.state===STATE.TITLE) startGame(); });
+  document.getElementById("dialog").addEventListener("click", ()=>{ if(game.state===STATE.DIALOG||game.state===STATE.CUTSCENE) advanceDialog(); });
 }
-setInterval(syncDpad, 150);
 
-// ---- Patch endBattleReturn to check victory ----
-const _origEndBattleReturn = endBattleReturn;
-// redefine globally
-window.endBattleReturn = function () {
-  _origEndBattleReturn();
-  updateGoal();
-  checkVictory();
-};
-// Patch all references inside battle.js by reassigning the global
-// (since JS looks up globals by name at call time this works automatically)
+function syncDpad(){
+  const hide = game.state===STATE.BATTLE||game.state===STATE.EVOLVE;
+  document.getElementById("dpad").style.display = hide?"none":"flex";
+}
+setInterval(syncDpad,150);
 
-// ---- Intro story ----
-const INTRO = [
-  "PLITSHON WORLD — a neon dimension where synthetic creatures bond with trainers.",
-  "The Grid is unstable. Three rogue trainers have jammed the signal towers!",
-  "Professor Zeon: 'You must challenge them and restore the network!'",
-  "Professor Zeon: 'Take TRUK — your first Plitshon — and begin your journey!'",
-  "Walk into TALL GRASS to find wild Plitshon.\nStep in front of a trainer to battle!",
-];
+// ---- title canvas ----
+function drawTitle(){
+  const c=document.getElementById("titleCanvas"), x=c.getContext("2d");
+  x.imageSmoothingEnabled=false;
+  let f=0;
+  (function anim(t){
+    if(game.state!==STATE.TITLE) return;
+    x.clearRect(0,0,c.width,c.height);
+    // mascots bobbing
+    drawCreature(x, c.width/2-70, c.height/2+10, 26, "truk", t);
+    drawCreature(x, c.width/2+70, c.height/2+14, 24, "flamix", t+400);
+    requestAnimationFrame(anim);
+  })(0);
+}
 
-function init() {
+function init(){
   rescale();
   window.addEventListener("resize", rescale);
-  setupDpad();
+  setupTouch();
   updateHUD();
-  updateGoal();
-  loop();
-  showDialog(INTRO);
+  requestAnimationFrame(loop);
+  drawTitle();
 }
-
 init();
