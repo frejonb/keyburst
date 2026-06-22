@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Plitshon</title>
+<title>Plitshon — Tulipa Region</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -12,88 +12,94 @@
   <div id="stage">
     <canvas id="overworld" width="640" height="480"></canvas>
 
-    <div id="hud" class="panel">
-      <span><span class="lbl">PARTY: </span><span class="name" id="hudName">Truk</span>
-      &nbsp;<span class="lv" id="hudLv">Lv.9</span>
-      &nbsp;<span class="hp" id="hudHp">HP 0/0</span></span>
-      <span class="goal" id="hudGoal">TRAINERS: 0/3</span>
+    <!-- HUD -->
+    <div id="hud">
+      <div id="hudParty" class="hudbox">
+        <span class="name" id="hudName">Truk</span>
+        <span class="lv" id="hudLv">Lv.1</span>
+        <span class="hpicon">&#9829;</span><span class="hp" id="hudHp">0/0</span>
+      </div>
+      <div id="hudGoal" class="hudbox">BADGES 0/3</div>
     </div>
 
-    <div id="dialog" class="panel">
+    <!-- Title screen -->
+    <div id="title" class="show">
+      <div id="titleInner">
+        <h1>PLITSHON</h1>
+        <div class="subtitle">~ Tulipa Region ~</div>
+        <canvas id="titleCanvas" width="320" height="150"></canvas>
+        <div class="press" id="titlePress">PRESS OK / ENTER</div>
+      </div>
+    </div>
+
+    <!-- Dialog box -->
+    <div id="dialog">
       <div class="line" id="dialogLine1"></div>
       <div class="line" id="dialogLine2"></div>
-      <div class="prompt">&#9654; Tap / Enter</div>
+      <span class="prompt">&#9660;</span>
     </div>
   </div>
-</div>
-
-<!-- On-screen D-pad (touch controls) -->
-<div id="dpad">
-  <span id="dpad-hint">MOVE</span>
-  <div id="dpad-grid">
-    <div class="dpad-empty"></div>
-    <button class="dpad-btn" data-dir="0">&#9650;</button>
-    <div class="dpad-empty"></div>
-    <button class="dpad-btn" data-dir="3">&#9664;</button>
-    <button class="dpad-btn dpad-center" id="dpad-action">OK</button>
-    <button class="dpad-btn" data-dir="1">&#9654;</button>
-    <div class="dpad-empty"></div>
-    <button class="dpad-btn" data-dir="2">&#9660;</button>
-    <div class="dpad-empty"></div>
-  </div>
-  <span id="dpad-hint">OK</span>
 </div>
 
 <!-- Battle overlay -->
 <div id="battle">
   <div class="arena">
-    <div class="combatant panel" id="enemyBox">
-      <div class="top">
-        <span class="cname" id="enemyName">--</span>
-        <span class="clv"  id="enemyLv">Lv.--</span>
+    <!-- enemy: info box + sprite on platform -->
+    <div class="enemyRow">
+      <div class="infobox" id="enemyBox">
+        <div class="topline"><span class="cname" id="enemyName">--</span><span class="clv" id="enemyLv">Lv.--</span></div>
+        <div class="hpline"><span class="hplabel">HP</span><div class="barwrap"><div class="hpfill" id="enemyHpFill"></div></div></div>
+        <div class="hptext" id="enemyHpText">--/--</div>
       </div>
-      <div class="barwrap"><div class="hpfill" id="enemyHpFill"></div></div>
-      <div class="hptext" id="enemyHpText">HP --/--</div>
+      <div class="platform enemyPlat"><canvas class="sprite" id="enemySprite" width="150" height="150"></canvas></div>
     </div>
 
-    <div class="spriteRow">
-      <canvas class="sprite" id="enemySprite" width="120" height="120"></canvas>
-    </div>
-
-    <div id="battleLog" class="panel"></div>
-
-    <div class="spriteRow player">
-      <canvas class="sprite" id="playerSprite" width="100" height="100"></canvas>
-    </div>
-
-    <div class="combatant panel" id="playerBox">
-      <div class="top">
-        <span class="cname" id="pName">--</span>
-        <span class="clv"  id="pLv">Lv.--</span>
+    <!-- player: sprite + info box -->
+    <div class="playerRow">
+      <div class="platform playerPlat"><canvas class="sprite" id="playerSprite" width="140" height="140"></canvas></div>
+      <div class="infobox" id="playerBox">
+        <div class="topline"><span class="cname" id="pName">--</span><span class="clv" id="pLv">Lv.--</span></div>
+        <div class="hpline"><span class="hplabel">HP</span><div class="barwrap"><div class="hpfill" id="pHpFill"></div></div></div>
+        <div class="hptext" id="pHpText">--/--</div>
+        <div class="hpline"><span class="hplabel">EXP</span><div class="barwrap exp"><div class="expfill" id="pExpFill"></div></div></div>
       </div>
-      <div class="barwrap"><div class="hpfill" id="pHpFill"></div></div>
-      <div class="hptext"  id="pHpText">HP --/--</div>
-      <div class="barwrap"><div class="expfill" id="pExpFill"></div></div>
-      <div class="exptext"  id="pExpText">EXP</div>
     </div>
 
-    <div id="moves"></div>
-    <div id="fleeRow"><button id="fleeBtn">FLEE</button></div>
+    <div id="battleLog"></div>
+
+    <div id="menuRow">
+      <div id="moves"></div>
+      <div id="fleeRow"><button id="fleeBtn">RUN</button></div>
+    </div>
   </div>
 </div>
 
 <!-- Evolution overlay -->
 <div id="evolve">
-  <div id="evolveSpriteWrap">
-    <canvas id="evolveSprite" width="140" height="140"></canvas>
-  </div>
+  <div id="evolveSpriteWrap"><canvas id="evolveSprite" width="170" height="170"></canvas></div>
   <div id="evolveText"></div>
-  <div id="evolvePrompt" style="visibility:hidden">&#9654; press any key</div>
+  <div id="evolvePrompt" style="visibility:hidden">&#9660; press any key</div>
+</div>
+
+<!-- On-screen controls -->
+<div id="dpad">
+  <div id="dpad-grid">
+    <div class="dpad-empty"></div>
+    <button class="dpad-btn" data-dir="0">&#9650;</button>
+    <div class="dpad-empty"></div>
+    <button class="dpad-btn" data-dir="3">&#9664;</button>
+    <div class="dpad-empty dpad-hub"></div>
+    <button class="dpad-btn" data-dir="1">&#9654;</button>
+    <div class="dpad-empty"></div>
+    <button class="dpad-btn" data-dir="2">&#9660;</button>
+    <div class="dpad-empty"></div>
+  </div>
+  <button id="dpad-action">OK</button>
 </div>
 
 <script src="js/data.js"></script>
-<script src="js/sprites.js"></script>
-<script src="js/overworld.js"></script>
+<script src="js/render.js"></script>
+<script src="js/world.js"></script>
 <script src="js/dialog.js"></script>
 <script src="js/movement.js"></script>
 <script src="js/battle.js"></script>
