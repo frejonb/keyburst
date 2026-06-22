@@ -8,19 +8,36 @@
 </head>
 <body>
 
-<div id="stage">
-  <canvas id="overworld" width="640" height="480"></canvas>
+<div id="stageWrap">
+  <div id="stage">
+    <canvas id="overworld" width="640" height="480"></canvas>
 
-  <div id="hud" class="panel">
-    <span class="lbl">PARTY: </span><span class="name" id="hudName">Truk</span>
-    &nbsp;<span class="lv" id="hudLv">Lv.9</span>
-    &nbsp;<span class="hp" id="hudHp">HP 0/0</span>
+    <div id="hud" class="panel">
+      <span class="lbl">PARTY: </span><span class="name" id="hudName">Truk</span>
+      &nbsp;<span class="lv" id="hudLv">Lv.9</span>
+      &nbsp;<span class="hp" id="hudHp">HP 0/0</span>
+    </div>
+
+    <div id="dialog" class="panel">
+      <div class="line" id="dialogLine1"></div>
+      <div class="line" id="dialogLine2"></div>
+      <div class="prompt">&#9654; Tap / Enter</div>
+    </div>
   </div>
+</div>
 
-  <div id="dialog" class="panel">
-    <div class="line" id="dialogLine1"></div>
-    <div class="line" id="dialogLine2"></div>
-    <div class="prompt">&#9654; Enter / Space</div>
+<!-- On-screen D-pad (touch controls) -->
+<div id="dpad">
+  <div id="dpad-grid">
+    <div></div>
+    <button class="dpad-btn" data-dir="0">&#9650;</button>
+    <div></div>
+    <button class="dpad-btn" data-dir="3">&#9664;</button>
+    <button class="dpad-btn dpad-center" id="dpad-action">&#9646;&#9646;</button>
+    <button class="dpad-btn" data-dir="1">&#9654;</button>
+    <div></div>
+    <button class="dpad-btn" data-dir="2">&#9660;</button>
+    <div></div>
   </div>
 </div>
 
