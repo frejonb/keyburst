@@ -249,7 +249,9 @@ function drawTileAt(ctx, id, px, py, t){
     case T_TULY: tulipTile(ctx,px,py,PAL.tYel,PAL.tYelDk); break;
     case T_WALL: wallTile(ctx,px,py); break;
     case T_ROOF: roofTile(ctx,px,py); break;
+    case T_CROOF: crossRoofTile(ctx,px,py); break;
     case T_DOOR: wallTile(ctx,px,py); doorTile(ctx,px,py); break;
+    case T_CDOOR: wallTile(ctx,px,py); doorTile(ctx,px,py,true); break;
     case T_MILL: grassBase(ctx,px,py); millTile(ctx,px,py,t); break;
     case T_SIGN: grassBase(ctx,px,py); signTile(ctx,px,py); break;
     case T_FENCE: grassBase(ctx,px,py); fenceTile(ctx,px,py); break;
@@ -331,10 +333,21 @@ function roofTile(ctx,px,py){
   ctx.strokeStyle=PAL.roofDk; ctx.lineWidth=1;
   for(let bx=px+4;bx<px+TILE;bx+=8){ ctx.beginPath(); ctx.moveTo(bx,py+6); ctx.lineTo(bx,py+TILE); ctx.stroke(); }
 }
-function doorTile(ctx,px,py){
-  ctx.fillStyle=PAL.door; roundRectPath(ctx,px+8,py+8,16,24,3); ctx.fill();
-  ctx.fillStyle=darken(PAL.door,30); ctx.fillRect(px+15,py+10,2,20);
-  ctx.fillStyle=PAL.tYel; fillEllipse(ctx,px+20,py+20,1.6,1.6);
+function crossRoofTile(ctx,px,py){
+  ctx.fillStyle=PAL.cRoofDk; ctx.fillRect(px,py,TILE,TILE);
+  ctx.fillStyle=PAL.cRoof; ctx.fillRect(px,py+3,TILE,TILE-3);
+  ctx.fillStyle="#F07A6E"; ctx.fillRect(px,py+3,TILE,3);
+  // white medical cross
+  ctx.fillStyle="#fff";
+  ctx.fillRect(px+13,py+8,6,18);
+  ctx.fillRect(px+7,py+14,18,6);
+}
+function doorTile(ctx,px,py,medical){
+  ctx.fillStyle=PAL.door; roundRectPath(ctx,px+8,py+6,16,26,3); ctx.fill();
+  ctx.fillStyle=darken(PAL.door,30); ctx.fillRect(px+15,py+8,2,22);
+  if(medical){ ctx.fillStyle="#fff"; ctx.fillRect(px+14,py+12,4,10); ctx.fillRect(px+11,py+15,10,4);
+    ctx.fillStyle=PAL.cRoof; ctx.fillRect(px+15,py+13,2,8); ctx.fillRect(px+12,py+16,8,2); }
+  else { ctx.fillStyle=PAL.tYel; fillEllipse(ctx,px+20,py+20,1.6,1.6); }
 }
 function millTile(ctx,px,py,t){
   ctx.fillStyle=PAL.millBody; roundRectPath(ctx,px+9,py+10,14,22,3); ctx.fill();

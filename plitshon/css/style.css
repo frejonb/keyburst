@@ -31,8 +31,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1c2b1c;
 
 /* ---- HUD ---- */
 #hud{position:absolute;top:8px;left:8px;right:8px;z-index:20;display:flex;
-  justify-content:space-between;pointer-events:none;font-weight:bold;}
+  justify-content:space-between;align-items:flex-start;pointer-events:none;font-weight:bold;}
+.hudright{display:flex;gap:6px;align-items:flex-start;pointer-events:auto;}
 .hudbox{padding:4px 10px;font-size:13px;letter-spacing:.5px;display:flex;gap:6px;align-items:center;}
+#muteBtn{cursor:pointer;font-family:inherit;font-size:14px;padding:3px 8px;}
 #hud .name{color:#3A5BAA;} #hud .lv{color:var(--gold);}
 #hud .hpicon{color:var(--hp-low);} #hud .hp{color:var(--ink);}
 #hud .hp.low{color:var(--hp-low);}
@@ -144,7 +146,49 @@ canvas.sprite{image-rendering:pixelated;position:relative;z-index:1;}
 .dpad-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #14141a;background:#50505c;color:#fff;}
 .dpad-empty{visibility:hidden;}
 .dpad-hub{visibility:visible;background:#2a2a32;border-radius:6px;margin:8px;}
+#actionCol{display:flex;flex-direction:column;align-items:center;gap:10px;}
 #dpad-action{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ff7a98,#E2453C 65%,#B5302A);
   border:4px solid var(--ink);color:#fff;font-weight:bold;font-size:20px;letter-spacing:1px;cursor:pointer;
   box-shadow:0 5px 0 #7a1f1a;touch-action:manipulation;}
 #dpad-action:active{transform:translateY(3px);box-shadow:0 2px 0 #7a1f1a;}
+#menuBtn{padding:8px 16px;border-radius:12px;background:#3a3a44;border:3px solid var(--ink);
+  color:#FFE600;font-family:inherit;font-weight:bold;font-size:14px;letter-spacing:1px;cursor:pointer;
+  box-shadow:0 4px 0 #14141a;touch-action:manipulation;}
+#menuBtn:active{transform:translateY(3px);box-shadow:0 1px 0 #14141a;}
+
+/* ---- Menu / Inventory overlay ---- */
+#menu{position:fixed;inset:0;z-index:55;display:none;align-items:center;justify-content:center;
+  background:rgba(10,8,18,.55);padding:14px;}
+#menu.show{display:flex;}
+#menuPanel{width:100%;max-width:460px;max-height:90vh;overflow-y:auto;background:var(--cream);
+  border:3px solid var(--ink);border-radius:14px;box-shadow:0 6px 0 var(--shadow);padding:12px 14px;}
+#menuHeader{display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:18px;
+  border-bottom:3px solid var(--ink);padding-bottom:6px;margin-bottom:6px;}
+#menuClose{width:34px;height:34px;border-radius:8px;background:#E2453C;border:3px solid var(--ink);
+  color:#fff;font-weight:bold;cursor:pointer;font-family:inherit;}
+#menuMsg{font-size:13px;font-weight:bold;color:#2C8A2C;min-height:16px;opacity:0;transition:opacity .2s;}
+#menuMsg.show{opacity:1;animation:fadeMsg 1.6s forwards;}
+@keyframes fadeMsg{0%,70%{opacity:1;}100%{opacity:0;}}
+.menuSection{margin-top:8px;}
+.menuSection h3{font-size:13px;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
+.mEmpty{font-size:13px;color:#8a7a5a;font-style:italic;padding:4px 0;}
+.mMon{display:flex;gap:10px;align-items:center;background:#FFF6E0;border:2px solid var(--ink);
+  border-radius:8px;padding:6px 8px;margin-bottom:5px;}
+.mMonSprite{image-rendering:pixelated;background:#dff0c8;border-radius:6px;flex-shrink:0;}
+.mMonInfo{flex:1;}
+.mMonTop{display:flex;justify-content:space-between;font-size:14px;}
+.mMonTop span{color:var(--gold);}
+.mBar{height:9px;background:#5a5040;border:2px solid var(--ink);border-radius:5px;overflow:hidden;margin:3px 0;}
+.mBarFill{height:100%;background:var(--hp-good);} .mBarFill.mid{background:var(--hp-mid);} .mBarFill.low{background:var(--hp-low);}
+.mBarFill.egg{background:var(--gold);}
+.mHp{font-size:11px;color:var(--ink);}
+.mEgg{display:flex;gap:10px;align-items:center;background:#FFF6E0;border:2px solid var(--ink);
+  border-radius:8px;padding:6px 8px;margin-bottom:5px;}
+.mEggIcon{font-size:24px;} .mEggInfo{flex:1;}
+.mEggTop{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;}
+.mEggTop span{color:var(--gold);font-weight:normal;}
+.mItem{display:flex;justify-content:space-between;align-items:center;background:#FFF6E0;
+  border:2px solid var(--ink);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:bold;}
+.mItem button{padding:5px 14px;background:#4CC04C;border:2px solid var(--ink);border-radius:6px;
+  color:#fff;font-weight:bold;font-family:inherit;cursor:pointer;}
+.mItem button:disabled{background:#aaa;cursor:default;}

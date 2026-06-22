@@ -35,6 +35,13 @@ function requestMove(dir){
 // Called when a step completes
 function onArrive(){
   const p = game.player;
+  // step bookkeeping: advance eggs
+  game.steps++;
+  tickEggs();
+
+  // enter a Doctor Center
+  if(MAP[p.ty][p.tx]===T_CDOOR){ enterDoctorCenter(); return; }
+
   // 1) find Truk if adjacent to the grove creature
   if(!game.flags.trukTaken && manhattan(p.tx,p.ty,TRUK_SPOT.x,TRUK_SPOT.y)===1){
     faceToward(p, TRUK_SPOT.x, TRUK_SPOT.y);
@@ -69,6 +76,7 @@ function faceToward(p,tx,ty){
 
 // trainer LOS: player stands in front of trainer within 4 clear tiles
 function trainerSeesPlayer(){
+  if(!game.flags.hasTruk) return null;     // no battles before you have a partner
   const p=game.player;
   for(const tr of TRAINERS){
     if(tr.defeated) continue;
@@ -98,6 +106,7 @@ function interact(){
   const tr=TRAINERS.find(t=>t.x===fx&&t.y===fy);
   if(tr){
     if(tr.defeated) showDialog([tr.post]);
+    else if(!game.flags.hasTruk) showDialog([`${tr.name}: Come back when you have a Plitshon of your own!`]);
     else { game.alertTrainer=tr.id; startTrainerEncounter(tr); }
     return;
   }
@@ -107,8 +116,53 @@ function interact(){
     showDialog([SIGNS[key]||"A weathered signpost."]);
     return;
   }
+  // Doctor Center door
+  if(MAP[fy] && MAP[fy][fx]===T_CDOOR){ enterDoctorCenter(); return; }
   // Door
   if(MAP[fy] && MAP[fy][fx]===T_DOOR){ showDialog(["The door is locked. Maybe later."]); return; }
+}
+
+// ---------- Doctor Center ----------
+function enterDoctorCenter(){
+  game.lastHeal = { x:game.player.tx, y:game.player.ty };
+  const needsHeal = game.party.some(p=>p.hp<p.maxHp);
+  const msgs = [
+    "You step into the DOCTOR CENTER.",
+    "Nurse Tineke: Welcome! Let me take your Plitshon.",
+  ];
+  if(game.party.length===0) msgs.push("Nurse Tineke: ...Oh, you have none yet! Come back soon.");
+  else msgs.push("Nurse Tineke: All better! Your Plitshon are fully healed.");
+  showDialog(msgs, ()=>{
+    healParty();
+    // step back out (south) so you don't re-trigger
+    const p=game.player; p.dir=2;
+    updateHUD();
+  });
+}
+function healParty(){
+  for(const p of game.party){ p.hp=p.maxHp; p.def=p.baseDef; for(const mv of p.moves) mv.pp=mv.maxPp; }
+}
+
+// ---------- Eggs ----------
+function addEgg(speciesId, level){
+  const steps = 18 + level*2;       // hatch time scales gently with level
+  game.eggs.push({ speciesId, level:Math.max(1,Math.floor(level*0.6)), stepsLeft:steps, totalSteps:steps });
+  updateHUD();
+}
+function tickEggs(){
+  if(game.eggs.length===0) return;
+  let hatched=null;
+  for(const e of game.eggs){ e.stepsLeft--; if(e.stepsLeft<=0 && !hatched) hatched=e; }
+  if(hatched){
+    game.eggs = game.eggs.filter(e=>e!==hatched);
+    const baby = makePlitshon(hatched.speciesId, Math.max(1,hatched.level));
+    let where;
+    if(game.party.length<PARTY_MAX){ game.party.push(baby); where="It joined your party!"; }
+    else { game.box.push(baby); where="Your party is full — it rests in the BOX."; }
+    updateHUD();
+    showDialog([`Huh? Your egg is hatching!`, `The egg hatched into ${baby.name} (Lv.${baby.level})!`, where]);
+  }
+  updateHUD();
 }
 
 // ---------- Find Truk cutscene ----------

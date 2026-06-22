@@ -19,7 +19,11 @@
         <span class="lv" id="hudLv">Lv.1</span>
         <span class="hpicon">&#9829;</span><span class="hp" id="hudHp">0/0</span>
       </div>
-      <div id="hudGoal" class="hudbox">BADGES 0/3</div>
+      <div class="hudright">
+        <div id="hudEgg" class="hudbox" style="display:none">🥚×0</div>
+        <div id="hudGoal" class="hudbox">BADGES 0/3</div>
+        <button id="muteBtn" class="hudbox" title="Music on/off">🔊</button>
+      </div>
     </div>
 
     <!-- Title screen -->
@@ -81,6 +85,17 @@
   <div id="evolvePrompt" style="visibility:hidden">&#9660; press any key</div>
 </div>
 
+<!-- Menu / Inventory overlay -->
+<div id="menu">
+  <div id="menuPanel">
+    <div id="menuHeader"><span>BAG &amp; PARTY</span><button id="menuClose">✕</button></div>
+    <div id="menuMsg"></div>
+    <div class="menuSection"><h3>PARTY</h3><div id="menuParty"></div></div>
+    <div class="menuSection"><h3>EGGS</h3><div id="menuEggs"></div></div>
+    <div class="menuSection"><h3>ITEMS</h3><div id="menuItems"></div></div>
+  </div>
+</div>
+
 <!-- On-screen controls -->
 <div id="dpad">
   <div id="dpad-grid">
@@ -94,14 +109,20 @@
     <button class="dpad-btn" data-dir="2">&#9660;</button>
     <div class="dpad-empty"></div>
   </div>
-  <button id="dpad-action">OK</button>
+  <div id="actionCol">
+    <button id="menuBtn">BAG</button>
+    <button id="dpad-action">OK</button>
+  </div>
 </div>
 
 <script src="js/data.js"></script>
 <script src="js/render.js"></script>
+<script src="js/creatures.js"></script>
+<script src="js/audio.js"></script>
 <script src="js/world.js"></script>
 <script src="js/dialog.js"></script>
 <script src="js/movement.js"></script>
+<script src="js/inventory.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/evolution.js"></script>
 <script src="js/input.js"></script>

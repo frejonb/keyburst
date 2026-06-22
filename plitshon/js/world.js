@@ -1,17 +1,24 @@
 // ============================================================
 //  WORLD — game state, camera, render loop, HUD
 // ============================================================
-const STATE = { TITLE:"title", OVERWORLD:"overworld", DIALOG:"dialog", BATTLE:"battle", EVOLVE:"evolve", CUTSCENE:"cutscene" };
+const STATE = { TITLE:"title", OVERWORLD:"overworld", DIALOG:"dialog", BATTLE:"battle", EVOLVE:"evolve", CUTSCENE:"cutscene", MENU:"menu" };
+
+const PARTY_MAX = 6;
 
 const game = {
   state: STATE.TITLE,
   player: {
-    tx: 16, ty: 6,                 // tile coords (start in town, on main street)
-    px: 16*TILE, py: 6*TILE,       // pixel coords (world space)
+    tx: 18, ty: 6,                 // tile coords (start in town, on main street)
+    px: 18*TILE, py: 6*TILE,       // pixel coords (world space)
     dir: 2, frame: 0,
     moving:false, fromPx:0, fromPy:0, moveStart:0, stepParity:0,
   },
   party: [],                        // EMPTY — Truk is found later
+  box: [],                          // overflow Plitshon (party full)
+  eggs: [],                         // {speciesId, level, stepsLeft, totalSteps}
+  items: { potion: 3 },
+  steps: 0,
+  lastHeal: { x:18, y:6 },          // respawn point (last doctor center / start)
   flags: { hasTruk:false, seenTall:false, trukTaken:false },
   alertTrainer: null,
   npcFrame: 0,
@@ -99,6 +106,12 @@ function updateHUD(){
   const g=document.getElementById("hudGoal");
   g.textContent = `BADGES ${defeated}/3`;
   g.classList.toggle("done", defeated===3);
+  // egg indicator
+  const eg=document.getElementById("hudEgg");
+  if(eg){
+    if(game.eggs.length>0){ eg.style.display=""; eg.textContent=`🥚×${game.eggs.length}`; }
+    else eg.style.display="none";
+  }
 }
 
 // ---------- main loop ----------
@@ -120,7 +133,7 @@ function loop(t){
     }
   }
 
-  if(game.state===STATE.OVERWORLD || game.state===STATE.DIALOG || game.state===STATE.CUTSCENE){
+  if(game.state===STATE.OVERWORLD || game.state===STATE.DIALOG || game.state===STATE.CUTSCENE || game.state===STATE.MENU){
     renderWorld(t);
   }
   requestAnimationFrame(loop);

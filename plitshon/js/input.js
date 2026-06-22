@@ -12,6 +12,10 @@ window.addEventListener("keydown", e=>{
     return;
   }
   if(game.state===STATE.EVOLVE){ e.preventDefault(); dismissEvolution(); return; }
+  if(game.state===STATE.MENU){
+    if(k==="Escape"||k==="i"||k==="I"||k==="Enter"){ e.preventDefault(); closeMenu(); }
+    return;
+  }
   if(game.state===STATE.DIALOG||game.state===STATE.CUTSCENE){
     if(k==="Enter"||k===" "||k==="z"||k==="Z"){ e.preventDefault(); advanceDialog(); }
     return;
@@ -19,6 +23,8 @@ window.addEventListener("keydown", e=>{
   if(game.state===STATE.BATTLE){ handleBattleKey(e); return; }
 
   if(game.state===STATE.OVERWORLD){
+    if(k==="i"||k==="I"){ e.preventDefault(); toggleMenu(); return; }
+    if(k==="m"||k==="M"){ e.preventDefault(); toggleMute(); return; }
     if(k==="Enter"||k===" "||k==="z"||k==="Z"){ e.preventDefault(); interact(); return; }
     if(k in DIRKEYS){ e.preventDefault(); keyDown[k]=true; requestMove(DIRKEYS[k]); }
   }
