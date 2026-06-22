@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plitshon</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="overworld" width="640" height="480"></canvas>
+
+  <div id="hud" class="panel">
+    <span class="lbl">PARTY: </span><span class="name" id="hudName">Truk</span>
+    &nbsp;<span class="lv" id="hudLv">Lv.9</span>
+    &nbsp;<span class="hp" id="hudHp">HP 0/0</span>
+  </div>
+
+  <div id="dialog" class="panel">
+    <div class="line" id="dialogLine1"></div>
+    <div class="line" id="dialogLine2"></div>
+    <div class="prompt">&#9654; Enter / Space</div>
+  </div>
+</div>
+
+<!-- Battle overlay -->
+<div id="battle">
+  <div class="arena">
+    <div class="combatant panel" id="enemyBox">
+      <div class="top">
+        <span class="cname" id="enemyName">--</span>
+        <span class="clv"  id="enemyLv">Lv.--</span>
+      </div>
+      <div class="barwrap"><div class="hpfill" id="enemyHpFill"></div></div>
+      <div class="hptext" id="enemyHpText">HP --/--</div>
+    </div>
+
+    <div class="spriteRow">
+      <canvas class="sprite" id="enemySprite" width="100" height="100"></canvas>
+    </div>
+
+    <div id="battleLog" class="panel"></div>
+
+    <div class="spriteRow player">
+      <canvas class="sprite" id="playerSprite" width="80" height="80"></canvas>
+    </div>
+
+    <div class="combatant panel" id="playerBox">
+      <div class="top">
+        <span class="cname" id="pName">--</span>
+        <span class="clv"  id="pLv">Lv.--</span>
+      </div>
+      <div class="barwrap"><div class="hpfill" id="pHpFill"></div></div>
+      <div class="hptext"  id="pHpText">HP --/--</div>
+      <div class="barwrap"><div class="expfill" id="pExpFill"></div></div>
+      <div class="exptext"  id="pExpText">EXP</div>
+    </div>
+
+    <div id="moves"></div>
+    <div id="fleeRow"><button id="fleeBtn">FLEE</button></div>
+  </div>
+</div>
+
+<!-- Evolution overlay -->
+<div id="evolve">
+  <div id="evolveSpriteWrap">
+    <canvas id="evolveSprite" width="140" height="140"></canvas>
+  </div>
+  <div id="evolveText"></div>
+  <div id="evolvePrompt" style="visibility:hidden">&#9654; press any key</div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/overworld.js"></script>
+<script src="js/dialog.js"></script>
+<script src="js/movement.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/evolution.js"></script>
+<script src="js/input.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
