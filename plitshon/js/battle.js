@@ -45,8 +45,8 @@ function beginBattle(enemy, trainer, enemyParty) {
     : `Wild ${enemy.name} appeared!`);
 
   renderBattle();
-  drawSprite(document.getElementById("enemySprite"),  enemy.speciesId,         enemy.color,         100);
-  drawSprite(document.getElementById("playerSprite"), battle.player.speciesId, battle.player.color, 80);
+  drawSprite(document.getElementById("enemySprite"),  enemy.speciesId,         enemy.color,         120);
+  drawSprite(document.getElementById("playerSprite"), battle.player.speciesId, battle.player.color, 100);
 }
 
 // ---------- Render ----------
