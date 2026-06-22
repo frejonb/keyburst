@@ -133,6 +133,8 @@ function updateHUD() {
   const el = document.getElementById("hudHp");
   el.textContent = `HP ${p.hp}/${p.maxHp}`;
   el.classList.toggle("low", p.hp < p.maxHp * 0.25);
+  // updateGoal is defined in main.js (loaded after), safe to call
+  if (typeof updateGoal === "function") updateGoal();
 }
 
 function loop() {
