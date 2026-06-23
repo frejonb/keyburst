@@ -27,6 +27,20 @@ class CraftScene extends Phaser.Scene {
 
     this.input.keyboard.on('keydown-ESC', ()=>this.close());
     this.rebuild();
+
+    if(!GAME.flags.seenForge){
+      GAME.flags.seenForge = true;
+      const tip = {
+        recipes:"Each card is a recipe: spend the listed blocks to forge that exact monster. Lit cards are ones you can afford — tap one!",
+        element:"Use – / + to commit element blocks. The element you commit most of decides the species; the total decides its level. Then tap FORGE.",
+        slots:"Tap your blocks to drop them into slots: ELEMENT sets the type, CORE sets the body tier, TRAIT leans the stats. Then tap FORGE.",
+      };
+      this.time.delayedCall(150, ()=> Dialog.show(this, [
+        { speaker:'Forgekeeper Vael', text:"This is the Forge! Here you turn loot blocks into living Forgemon." },
+        { speaker:'Forgekeeper Vael', text:tip[CONFIG.CRAFT_MODE] },
+        { speaker:'Forgekeeper Vael', text:"You can change how crafting works any time in ⚙ Settings. Experiment and find what you like!" },
+      ]));
+    }
   }
 
   close(){ this.scene.stop(); this.scene.resume('World'); }

@@ -3,6 +3,8 @@
 //  forge & heal buildings. Stays alive; battle/menus launch on top.
 // ============================================================
 const SOLID = { t_tree:1, t_water:1, t_wall:1, t_roof:1 };
+// dir 0=up, 1=right, 2=down, 3=left
+const DIRS = [[0,-1],[1,0],[0,1],[-1,0]];
 
 class WorldScene extends Phaser.Scene {
   constructor(){ super('World'); }
@@ -31,8 +33,12 @@ class WorldScene extends Phaser.Scene {
     // input
     this.cursors = this.input.keyboard.createCursorKeys();
     this.keys = this.input.keyboard.addKeys('W,A,S,D');
+    this.input.addPointer(2);      // allow a couple of simultaneous touches
+    this.touchDir = null;
+    this.dialogOpen = false;
 
     this.buildHUD();
+    this.buildControls();
 
     // refresh after returning from battle/menus
     this.events.on('resume', ()=> this.onResume());
@@ -40,8 +46,28 @@ class WorldScene extends Phaser.Scene {
 
     if(!GAME.flags.intro){
       GAME.flags.intro = true;
-      this.toast('Welcome to the Forge Vale! Step in tall grass to find wild Forgemon. Their loot lets you CRAFT new monsters at the forge (orange tile).', 5200);
+      this.time.delayedCall(350, ()=> this.showIntro());
     }
+  }
+
+  // ---------------- guided story ----------------
+  showIntro(){
+    Dialog.show(this, [
+      { speaker:'Forgekeeper Vael', text:"Welcome to Forge Vale, apprentice! I am Vael, keeper of the great Forge." },
+      { speaker:'Forgekeeper Vael', text:"In our land we do not capture monsters — we FORGE them. This little Emberling is your first companion." },
+      { speaker:'Forgekeeper Vael', text:"Move with the D-PAD at the bottom-left (or arrow keys). Walk into the tall green grass to meet a wild Forgemon." },
+      { speaker:'Forgekeeper Vael', text:"Battles are one-on-one. When a wild Forgemon faints it SHATTERS into element blocks — that is your crafting loot." },
+      { speaker:'Forgekeeper Vael', text:"Bring those blocks to the orange FORGE tile (or tap FORGE) to craft a brand-new monster for your party." },
+      { speaker:'Forgekeeper Vael', text:"Hurt party? Step on the house DOOR to heal for free. Now go — gather loot and forge your team!" },
+    ]);
+  }
+  guideToForge(){
+    if(GAME.flags.seenLoot) return;
+    GAME.flags.seenLoot = true;
+    Dialog.show(this, [
+      { speaker:'Forgekeeper Vael', text:"Well fought! The wild Forgemon left behind loot blocks — check the top of the screen." },
+      { speaker:'Forgekeeper Vael', text:"Head to the orange FORGE tile up north, or just tap the FORGE button, to turn those blocks into a new monster." },
+    ]);
   }
 
   // ---------------- map ----------------
@@ -130,20 +156,58 @@ class WorldScene extends Phaser.Scene {
       this.player.setPosition(this.ptx*this.T+this.T/2, this.pty*this.T+this.T/2);
       this.toast('You were carried back to the forge and your party was healed.', 3200);
     }
-    if(this.pendingLoot){ const l=this.pendingLoot; this.pendingLoot=null; this.showLoot(l); }
+    if(this.pendingLoot){
+      const l=this.pendingLoot; this.pendingLoot=null;
+      this.showLoot(l);
+      if(!GAME.flags.seenLoot) this.time.delayedCall(600, ()=> this.guideToForge());
+    }
+  }
+
+  // ---------------- touch controls ----------------
+  buildControls(){
+    const H=this.scale.height;
+    const s=56, cx=74, cy=H-104;           // d-pad centre, bottom-left
+    const pads=[
+      [0,'▲', cx,      cy-s ],
+      [2,'▼', cx,      cy+s ],
+      [3,'◀', cx-s,    cy   ],
+      [1,'▶', cx+s,    cy   ],
+    ];
+    this.dpad=[];
+    pads.forEach(([dir,glyph,x,y])=>{
+      const g=this.add.graphics().setScrollFactor(0).setDepth(60);
+      const draw=(pressed)=>{ g.clear();
+        g.fillStyle(0x000000,0.25); g.fillRoundedRect(x-s/2+2,y-s/2+3,s,s,12);
+        g.fillStyle(pressed?0xff6b3d:0x2a2740, 0.92); g.fillRoundedRect(x-s/2,y-s/2,s,s,12);
+        g.lineStyle(2,0x4a4570,1); g.strokeRoundedRect(x-s/2,y-s/2,s,s,12);
+      };
+      draw(false);
+      const label=this.add.text(x,y,glyph,{ fontFamily:UI.FONT, fontSize:'26px', color:'#f4f0ff' })
+        .setOrigin(0.5).setScrollFactor(0).setDepth(61);
+      const hit=this.add.zone(x,y,s+6,s+6).setScrollFactor(0).setDepth(62)
+        .setInteractive();
+      const press=()=>{ this.touchDir=dir; draw(true); };
+      const release=()=>{ if(this.touchDir===dir) this.touchDir=null; draw(false); };
+      hit.on('pointerdown',press);
+      hit.on('pointerup',release);
+      hit.on('pointerout',release);
+      hit.on('pointerupoutside',release);
+      this.dpad.push({g,label,hit});
+    });
   }
 
   // ---------------- update / movement ----------------
   update(){
-    if(this.moving) return;
-    let dx=0,dy=0;
-    if(this.cursors.left.isDown||this.keys.A.isDown) dx=-1;
-    else if(this.cursors.right.isDown||this.keys.D.isDown) dx=1;
-    else if(this.cursors.up.isDown||this.keys.W.isDown) dy=-1;
-    else if(this.cursors.down.isDown||this.keys.S.isDown) dy=1;
-    if(dx===0&&dy===0) return;
+    if(this.moving || this.dialogOpen) return;
+    let dir=null;
+    if(this.cursors.left.isDown||this.keys.A.isDown) dir=3;
+    else if(this.cursors.right.isDown||this.keys.D.isDown) dir=1;
+    else if(this.cursors.up.isDown||this.keys.W.isDown) dir=0;
+    else if(this.cursors.down.isDown||this.keys.S.isDown) dir=2;
+    if(this.touchDir!=null) dir=this.touchDir;
+    if(dir==null) return;
 
-    const nx=this.ptx+dx, ny=this.pty+dy;
+    const nx=this.ptx+DIRS[dir][0], ny=this.pty+DIRS[dir][1];
     if(!this.walkable(nx,ny)) return;
     this.step(nx,ny);
   }
@@ -191,8 +255,8 @@ class WorldScene extends Phaser.Scene {
     if(this.toastEl) this.toastEl.destroy();
     const W=this.scale.width;
     const c=this.add.container(0,0).setScrollFactor(0).setDepth(80);
-    const bg=UI.panel(this, 20, this.scale.height-118, W-40, 60, { radius:10, fill:0x161327 });
-    const t=UI.text(this, 36, this.scale.height-108, msg, { size:14, wrap:W-72, color:'#f4f0ff' });
+    const bg=UI.panel(this, 232, 8, W-240, 52, { radius:10, fill:0x161327 });
+    const t=UI.text(this, 248, 16, msg, { size:13, wrap:W-272, color:'#f4f0ff' });
     c.add([bg,t]); this.toastEl=c;
     this.time.delayedCall(ms, ()=>{ if(this.toastEl===c){ c.destroy(); this.toastEl=null; } });
   }
