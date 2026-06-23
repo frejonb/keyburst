@@ -118,6 +118,27 @@ window.ART = {
   },
 
   // ---------------------------------------------------------
+  // battle VFX textures (white so they can be tinted per element)
+  fxTextures(scene){
+    // soft glowing orb
+    let g=scene.make.graphics({x:0,y:0,add:false});
+    for(let i=14;i>=1;i--){ g.fillStyle(0xffffff, (i/14)*0.10); g.fillCircle(18,18,i*1.25); }
+    g.fillStyle(0xffffff,1); g.fillCircle(18,18,5);
+    g.generateTexture('fx_orb',36,36); g.destroy();
+    // round dot
+    g=scene.make.graphics({x:0,y:0,add:false}); g.fillStyle(0xffffff,1); g.fillCircle(6,6,6);
+    g.generateTexture('fx_dot',12,12); g.destroy();
+    // spark diamond
+    g=scene.make.graphics({x:0,y:0,add:false}); g.fillStyle(0xffffff,1);
+    g.beginPath(); g.moveTo(5,0); g.lineTo(10,5); g.lineTo(5,10); g.lineTo(0,5); g.closePath(); g.fillPath();
+    g.generateTexture('fx_spark',10,10); g.destroy();
+    // chunky shard (for terra / impacts)
+    g=scene.make.graphics({x:0,y:0,add:false}); g.fillStyle(0xffffff,1);
+    g.fillRoundedRect(0,0,12,12,3);
+    g.generateTexture('fx_chunk',12,12); g.destroy();
+  },
+
+  // ---------------------------------------------------------
   tileTextures(scene){
     const T = CONFIG.TILE;
     const mk = (key, draw)=>{ const g=scene.make.graphics({x:0,y:0,add:false}); draw(g); g.generateTexture(key,T,T); g.destroy(); };

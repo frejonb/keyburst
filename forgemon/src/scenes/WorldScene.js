@@ -126,10 +126,10 @@ class WorldScene extends Phaser.Scene {
     this.hudName = UI.text(this, 62, 14, '', { size:15, bold:true }).setScrollFactor(0).setDepth(51);
     this.hudHp   = UI.text(this, 62, 36, '', { size:13, color:'#cfc7ea' }).setScrollFactor(0).setDepth(51);
 
-    const py = this.scale.height-46;
-    this.btnParty = UI.button(this, W-216, py, 100, 38, 'PARTY', ()=> this.openMenu('Party'),  { fill:0x3a3560 });
-    this.btnCraft = UI.button(this, W-110, py, 100, 38, 'FORGE', ()=> this.openMenu('Craft'),  { fill:0x6b3d8e });
-    this.btnSet   = UI.button(this, W-216, py-46, 100, 30, '⚙ Settings', ()=> this.openMenu('Settings'), { fill:0x2a2740, size:13 });
+    const H=this.scale.height;
+    this.btnCraft = UI.button(this, W-130, H-64, 118, 52, 'FORGE', ()=> this.openMenu('Craft'),  { fill:0x6b3d8e, size:19, bold:true });
+    this.btnParty = UI.button(this, W-256, H-64, 118, 52, 'PARTY', ()=> this.openMenu('Party'),  { fill:0x3a3560, size:19, bold:true });
+    this.btnSet   = UI.button(this, W-256, H-120, 118, 42, '⚙ Settings', ()=> this.openMenu('Settings'), { fill:0x2a2740, size:15 });
     [this.btnParty,this.btnCraft,this.btnSet].forEach(b=> b.setScrollFactor(0).setDepth(51));
 
     this.refreshHUD();
@@ -166,26 +166,26 @@ class WorldScene extends Phaser.Scene {
   // ---------------- touch controls ----------------
   buildControls(){
     const H=this.scale.height;
-    const s=56, cx=74, cy=H-104;           // d-pad centre, bottom-left
+    const bs=62, off=66, cx=98, cy=H-112;   // box size, spacing, centre
     const pads=[
-      [0,'▲', cx,      cy-s ],
-      [2,'▼', cx,      cy+s ],
-      [3,'◀', cx-s,    cy   ],
-      [1,'▶', cx+s,    cy   ],
+      [0,'▲', cx,       cy-off ],
+      [2,'▼', cx,       cy+off ],
+      [3,'◀', cx-off,   cy     ],
+      [1,'▶', cx+off,   cy     ],
     ];
     this.dpad=[];
     pads.forEach(([dir,glyph,x,y])=>{
       const g=this.add.graphics().setScrollFactor(0).setDepth(60);
       const draw=(pressed)=>{ g.clear();
-        g.fillStyle(0x000000,0.25); g.fillRoundedRect(x-s/2+2,y-s/2+3,s,s,12);
-        g.fillStyle(pressed?0xff6b3d:0x2a2740, 0.92); g.fillRoundedRect(x-s/2,y-s/2,s,s,12);
-        g.lineStyle(2,0x4a4570,1); g.strokeRoundedRect(x-s/2,y-s/2,s,s,12);
+        g.fillStyle(0x000000,0.30); g.fillRoundedRect(x-bs/2+2,y-bs/2+3,bs,bs,14);
+        g.fillStyle(pressed?0xff6b3d:0x2a2740, 0.94); g.fillRoundedRect(x-bs/2,y-bs/2,bs,bs,14);
+        g.lineStyle(2,0x5a5488,1); g.strokeRoundedRect(x-bs/2,y-bs/2,bs,bs,14);
       };
       draw(false);
-      const label=this.add.text(x,y,glyph,{ fontFamily:UI.FONT, fontSize:'26px', color:'#f4f0ff' })
+      const label=this.add.text(x,y,glyph,{ fontFamily:UI.FONT, fontSize:'30px', color:'#f4f0ff' })
         .setOrigin(0.5).setScrollFactor(0).setDepth(61);
-      const hit=this.add.zone(x,y,s+6,s+6).setScrollFactor(0).setDepth(62)
-        .setInteractive();
+      // generous hit area, larger than the visible box
+      const hit=this.add.zone(x,y,bs+16,bs+16).setScrollFactor(0).setDepth(62).setInteractive();
       const press=()=>{ this.touchDir=dir; draw(true); };
       const release=()=>{ if(this.touchDir===dir) this.touchDir=null; draw(false); };
       hit.on('pointerdown',press);
