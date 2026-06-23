@@ -24,18 +24,20 @@ class PartyScene extends Phaser.Scene {
       const col=i%2, row=Math.floor(i/2);
       const x=40+col*((W-80)/2+0)+col*8, y=70+row*116;
       const cw=(W-96)/2;
-      this.body.add(UI.panel(this, x, y, cw, 104, { radius:12, fill: i===0?0x2f2a4e:0x241f3a, line: i===0?0xffcf4d:0x3a3660 }));
-      this.body.add(this.add.image(x+44, y+50, 'mon_'+m.speciesId).setScale(0.8));
-      if(i===0) this.body.add(UI.text(this, x+12, y+8, 'LEAD', { size:11, bold:true, color:'#ffcf4d' }));
-      this.body.add(UI.text(this, x+88, y+10, `${m.name}`, { size:17, bold:true }));
-      this.body.add(UI.text(this, x+88, y+32, `Lv.${m.level} · ${ELEMENTS[m.element].name}${m.trait?' · '+m.trait:''}`, { size:12, color:ELEMENTS[m.element].hex }));
-      this.body.add(UI.text(this, x+88, y+50, `HP ${Math.max(0,m.hp)}/${m.maxHp}   ATK ${m.atk}  DEF ${m.def}`, { size:12, color:'#cfc7ea' }));
-      this.body.add(UI.text(this, x+88, y+68, m.moves.map(mv=>mv.name).join(', '), { size:11, color:'#9a93bd', wrap:cw-100 }));
-      if(i!==0){
-        this.body.add(UI.button(this, x+cw-92, y+8, 84, 24, 'Set Lead', ()=>{ GAME.party.splice(i,1); GAME.party.unshift(m); this.rebuild(); }, { fill:0x4a3f78, size:12 }));
-      }
+      this.body.add(UI.panel(this, x, y, cw, 108, { radius:12, fill: i===0?0x2f2a4e:0x241f3a, line: i===0?0xffcf4d:0x3a3660 }));
+      this.body.add(this.add.image(x+42, y+42, 'mon_'+m.speciesId).setScale(0.78));
+      this.body.add(UI.text(this, x+84, y+8, `${m.name}`, { size:16, bold:true }));
+      if(i===0) this.body.add(UI.text(this, x+cw-12, y+10, 'LEAD', { size:11, bold:true, color:'#ffcf4d', ox:1 }));
+      this.body.add(UI.text(this, x+84, y+28, `Lv.${m.level} · ${ELEMENTS[m.element].name}${m.trait?' · '+m.trait:''}`, { size:12, color:ELEMENTS[m.element].hex }));
+      this.body.add(UI.text(this, x+84, y+46, `HP ${Math.max(0,m.hp)}/${m.maxHp}  ATK ${m.atk} DEF ${m.def}`, { size:12, color:'#cfc7ea' }));
+      // bottom action row (kept clear of the name)
       if(m.hp<m.maxHp && itemCount('potion')>0){
-        this.body.add(UI.button(this, x+cw-92, y+72, 84, 24, `+Potion`, ()=>{ GAME.inventory.items.potion--; m.hp=Math.min(m.maxHp,m.hp+ITEMS.potion.heal); this.rebuild(); }, { fill:0x2f7d5a, size:12 }));
+        this.body.add(UI.button(this, x+10, y+76, 96, 26, `+ Potion`, ()=>{ GAME.inventory.items.potion--; m.hp=Math.min(m.maxHp,m.hp+ITEMS.potion.heal); this.rebuild(); }, { fill:0x2f7d5a, size:13 }));
+      } else {
+        this.body.add(UI.text(this, x+12, y+82, m.moves.map(mv=>mv.name).join(', '), { size:11, color:'#9a93bd', wrap:cw-110 }));
+      }
+      if(i!==0){
+        this.body.add(UI.button(this, x+cw-104, y+76, 96, 26, '★ Set Lead', ()=>{ GAME.party.splice(i,1); GAME.party.unshift(m); this.rebuild(); }, { fill:0x4a3f78, size:13 }));
       }
     });
     const yb=70+Math.ceil(GAME.party.length/2)*116+4;

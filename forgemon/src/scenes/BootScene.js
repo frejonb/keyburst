@@ -11,6 +11,7 @@ class BootScene extends Phaser.Scene {
     // player + tiles
     ART.playerTexture(this, 'player');
     ART.tileTextures(this);
+    ART.fxTextures(this);
     newGame();
     this.scene.start('Title');
   }

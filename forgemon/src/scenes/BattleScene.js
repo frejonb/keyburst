@@ -29,8 +29,8 @@ class BattleScene extends Phaser.Scene {
     this.makeBox('p', 360, 262, this.player, true);
 
     // message + menu areas
-    this.msgBg = UI.panel(this, 16, 356, W-32, 44, { radius:8, fill:0x141029 });
-    this.msg = UI.text(this, 30, 366, '', { size:16 });
+    this.msgBg = UI.panel(this, 16, 344, W-32, 36, { radius:8, fill:0x141029 });
+    this.msg = UI.text(this, 30, 353, '', { size:15 });
     this.menu = this.add.container(0,0);
 
     this.say(`A wild ${this.enemy.name} appeared!`);
@@ -84,7 +84,7 @@ class BattleScene extends Phaser.Scene {
   clearMenu(){ this.menu.removeAll(true); }
   showMain(){
     this.mode='main'; this.clearMenu();
-    const W=this.scale.width, y=410, h=56, gap=10, bw=(W-32-gap*3)/4;
+    const W=this.scale.width, MY=386, MH=88, gap=8, bw=(W-32-gap*3)/4;
     const opts=[
       ['FIGHT', 0xff6b3d, ()=>this.showFight()],
       ['BAG',   0x3a7bd5, ()=>this.showBag()],
@@ -92,48 +92,60 @@ class BattleScene extends Phaser.Scene {
       ['RUN',   0x555078, ()=>this.doRun()],
     ];
     opts.forEach((o,i)=>{
-      const b=UI.button(this, 16+i*(bw+gap), y, bw, h, o[0], o[2], { fill:o[1], bold:true, size:17 });
+      const b=UI.button(this, 16+i*(bw+gap), MY, bw, MH, o[0], o[2], { fill:o[1], bold:true, size:21 });
       this.menu.add(b);
     });
   }
+  _backBtn(){
+    const W=this.scale.width;
+    return UI.button(this, W-72, 386, 56, 88, '‹\nBack', ()=>this.showMain(), { fill:0x2a2740, size:14 });
+  }
   showFight(){
     this.mode='fight'; this.clearMenu();
-    const W=this.scale.width, y=410, h=26, gap=8, bw=(W-32-gap)/2;
+    const W=this.scale.width, MY=386, MH=88, gap=8;
+    const Wc=W-32-56-8, cw=(Wc-gap)/2, ch=(MH-gap)/2;
     this.player.moves.forEach((mv,i)=>{
       const col=i%2, row=Math.floor(i/2);
       const el=MOVES[mv.name].element;
       const tint=el?ELEMENTS[el].color:0x4a4570;
-      const b=UI.button(this, 16+col*(bw+gap), y+row*(h+8), bw, h,
-        `${mv.name}  (${mv.pp}/${mv.maxPp})`, ()=>{ if(mv.pp>0) this.playerMove(i); }, { fill:tint, size:14 });
+      const b=UI.button(this, 16+col*(cw+gap), MY+row*(ch+gap), cw, ch,
+        `${mv.name}\nPP ${mv.pp}/${mv.maxPp}`, ()=>{ if(mv.pp>0) this.playerMove(i); }, { fill:tint, size:16, bold:true });
       if(mv.pp<=0) b.setEnabled(false);
       this.menu.add(b);
     });
-    const back=UI.button(this, W-96, 410, 80, 26, '‹ Back', ()=>this.showMain(), { fill:0x2a2740, size:13 });
-    this.menu.add(back);
+    this.menu.add(this._backBtn());
   }
   showBag(){
     this.mode='bag'; this.clearMenu();
+    const W=this.scale.width, MY=386, MH=88, gap=8;
+    const Wc=W-32-56-8, cw=(Wc-gap)/2, ch=(MH-gap)/2;
     const ids=Object.keys(ITEMS).filter(id=>itemCount(id)>0);
-    const W=this.scale.width;
-    if(!ids.length){ this.menu.add(UI.text(this, 24, 414, 'No items in bag.', {size:15, color:'#a9a3c4'})); }
+    if(!ids.length){ this.menu.add(UI.text(this, 24, MY+32, 'No items in bag.', {size:16, color:'#a9a3c4'})); }
     ids.forEach((id,i)=>{
-      const b=UI.button(this, 16+i*150, 410, 140, 30, `${ITEMS[id].name} ×${itemCount(id)}`, ()=>this.useItem(id), { fill:0x2f7d5a, size:13 });
+      const col=i%2, row=Math.floor(i/2);
+      const b=UI.button(this, 16+col*(cw+gap), MY+row*(ch+gap), cw, ch,
+        `${ITEMS[id].name} ×${itemCount(id)}`, ()=>this.useItem(id), { fill:0x2f7d5a, size:15 });
       this.menu.add(b);
     });
-    this.menu.add(UI.button(this, W-96, 410, 80, 30, '‹ Back', ()=>this.showMain(), { fill:0x2a2740, size:13 }));
+    this.menu.add(this._backBtn());
   }
   showSwitch(){
     this.mode='switch'; this.clearMenu();
-    const W=this.scale.width;
-    GAME.party.forEach((m,i)=>{
-      if(m===this.player) return;
+    const W=this.scale.width, MY=386, MH=88, gap=6;
+    const Wc=W-32-56-8, cw=(Wc-gap)/2;
+    const others=GAME.party.filter(m=>m!==this.player);
+    const rows=Math.max(1, Math.ceil(others.length/2));
+    const ch=Math.min(42, (MH-(rows-1)*gap)/rows);
+    if(!others.length){ this.menu.add(UI.text(this, 24, MY+32, 'No others to switch to.', {size:16, color:'#a9a3c4'})); }
+    others.forEach((m,i)=>{
+      const col=i%2, row=Math.floor(i/2);
       const dead=m.hp<=0;
-      const b=UI.button(this, 16+(i%3)*200, 408+Math.floor(i/3)*32, 190, 28,
-        `${m.name} Lv.${m.level} (${Math.max(0,m.hp)}/${m.maxHp})`, ()=>this.doSwitch(m), { fill:0x4a3f78, size:12 });
+      const b=UI.button(this, 16+col*(cw+gap), MY+row*(ch+gap), cw, ch,
+        `${m.name} Lv.${m.level} (${Math.max(0,m.hp)}/${m.maxHp})`, ()=>this.doSwitch(m), { fill:0x4a3f78, size:13 });
       if(dead) b.setEnabled(false);
       this.menu.add(b);
     });
-    this.menu.add(UI.button(this, W-96, 408, 80, 28, '‹ Back', ()=>this.showMain(), { fill:0x2a2740, size:12 }));
+    this.menu.add(this._backBtn());
   }
 
   // ---------- combat ----------
@@ -151,16 +163,17 @@ class BattleScene extends Phaser.Scene {
     if(this.busy) return; this.busy=true; this.clearMenu();
     const mv=this.player.moves[idx]; mv.pp--;
     const m=MOVES[mv.name];
-    if(m.effect){ this.applyEffect(this.player, m.effect, this.player.name, mv.name); this.afterPlayer(); return; }
-    this.say(`${this.player.name} used ${mv.name}!`);
-    this.lunge(this.playerSpr, 1);
+    if(m.effect){ this.applyEffect(this.player, m.effect, this.player.name, mv.name); this.castBuffFX(this.playerSpr, m.element); this.afterPlayer(); return; }
     const {dmg,eff}=this.calcDamage(mv.name, this.player, this.enemy);
-    this.time.delayedCall(220, ()=>{
-      this.enemy.hp-=dmg; this.flash(this.enemySpr); this.drawHp('e');
-      this.effMsg(eff, this.enemy.name, dmg);
-      this.time.delayedCall(520, ()=>{
-        if(this.enemy.hp<=0) this.onEnemyFaint(); else this.afterPlayer();
-      });
+    const big=m.power>=60;
+    this.say(`${this.player.name} used ${mv.name}!`);
+    if(big) this.moveBanner(mv.name, m.element);
+    this.chargeUp(this.playerSpr, m.element);
+    this.time.delayedCall(big?320:200, ()=>{
+      this.lunge(this.playerSpr, 1);
+      this.castFX(m.element, this.playerSpr.x, this.playerSpr.y, this.enemySpr.x, this.enemySpr.y, big,
+        ()=>{ this.enemy.hp-=dmg; this.flash(this.enemySpr); this.knock(this.enemySpr, 1); this.drawHp('e'); this.effMsg(eff, this.enemy.name, dmg); },
+        ()=>{ if(this.enemy.hp<=0) this.onEnemyFaint(); else this.afterPlayer(); });
     });
   }
   afterPlayer(){ this.time.delayedCall(420, ()=>this.enemyTurn()); }
@@ -171,19 +184,112 @@ class BattleScene extends Phaser.Scene {
     if(this.enemy.hp>this.enemy.maxHp*0.4){ const atks=pool.filter(m=>MOVES[m.name].power>0); if(atks.length) pool=atks; }
     const mv=choice(pool); if(mv.pp>0) mv.pp--;
     const m=MOVES[mv.name];
-    if(m.effect){ this.applyEffect(this.enemy, m.effect, this.enemy.name, mv.name); this.time.delayedCall(700, ()=>this.endTurn()); return; }
-    this.say(`Wild ${this.enemy.name} used ${mv.name}!`);
-    this.lunge(this.enemySpr, -1);
+    if(m.effect){ this.applyEffect(this.enemy, m.effect, this.enemy.name, mv.name); this.castBuffFX(this.enemySpr, m.element); this.time.delayedCall(700, ()=>this.endTurn()); return; }
     const {dmg,eff}=this.calcDamage(mv.name, this.enemy, this.player);
-    this.time.delayedCall(220, ()=>{
-      this.player.hp-=dmg; this.flash(this.playerSpr); this.drawHp('p');
-      this.effMsg(eff, this.player.name, dmg);
-      this.time.delayedCall(520, ()=>{
-        if(this.player.hp<=0) this.onPlayerFaint(); else this.endTurn();
-      });
+    const big=m.power>=60;
+    this.say(`Wild ${this.enemy.name} used ${mv.name}!`);
+    if(big) this.moveBanner(mv.name, m.element);
+    this.chargeUp(this.enemySpr, m.element);
+    this.time.delayedCall(big?320:200, ()=>{
+      this.lunge(this.enemySpr, -1);
+      this.castFX(m.element, this.enemySpr.x, this.enemySpr.y, this.playerSpr.x, this.playerSpr.y, big,
+        ()=>{ this.player.hp-=dmg; this.flash(this.playerSpr); this.knock(this.playerSpr, -1); this.drawHp('p'); this.effMsg(eff, this.player.name, dmg); },
+        ()=>{ if(this.player.hp<=0) this.onPlayerFaint(); else this.endTurn(); });
     });
   }
   endTurn(){ this.busy=false; this.showMain(); }
+
+  // ============================================================
+  //  Ability VFX — dramatic, element-themed attack animations
+  // ============================================================
+  moveBanner(name, el){
+    const W=this.scale.width;
+    const color = el?ELEMENTS[el].hex:'#ffffff';
+    const t=this.add.text(W/2, 122, name.toUpperCase(), {
+      fontFamily:UI.FONT, fontSize:'46px', color, fontStyle:'bold', stroke:'#0a0814', strokeThickness:7,
+    }).setOrigin(0.5).setDepth(45).setScale(0.4).setAlpha(0);
+    this.tweens.add({ targets:t, scale:1, alpha:1, duration:200, ease:'Back.out' });
+    this.tweens.add({ targets:t, alpha:0, y:108, delay:560, duration:280, onComplete:()=>t.destroy() });
+  }
+
+  chargeUp(spr, el){
+    const color = el?ELEMENTS[el].color:0xffffff;
+    const glow=this.add.image(spr.x, spr.y, 'fx_orb').setTint(color).setBlendMode('ADD').setScale(0.2).setAlpha(0.9).setDepth(19);
+    this.tweens.add({ targets:glow, scale:2.2, alpha:0, duration:340, ease:'Cubic.out', onComplete:()=>glow.destroy() });
+  }
+  castBuffFX(spr, el){
+    const color = el?ELEMENTS[el].color:0x6ee0a0;
+    const p=this.add.particles(0,0,'fx_spark',{ x:spr.x, y:spr.y+30, speedY:{min:-140,max:-60}, speedX:{min:-40,max:40},
+      lifespan:600, scale:{start:1.1,end:0}, tint:color, blendMode:'ADD', quantity:0, emitting:false }).setDepth(22);
+    p.explode(22);
+    this.time.delayedCall(900,()=>p.destroy());
+  }
+
+  // core dispatcher: source (sx,sy) -> target (tx,ty)
+  castFX(el, sx, sy, tx, ty, big, onImpact, onDone){
+    const dur = big?780:560;
+    if(el==='volt'){
+      this.lightning(sx,sy,tx,ty, ()=>{ this.impact(tx,ty, ELEMENTS.volt.color, big); onImpact&&onImpact(); });
+      this.time.delayedCall(dur, ()=>onDone&&onDone()); return;
+    }
+    if(el==='terra'){
+      for(let i=0;i<6;i++){
+        const o=this.add.image(sx,sy,'fx_chunk').setTint(i%2?0xb07a3f:0x8a5a2b).setScale(1.6+Math.random()).setDepth(28).setAngle(Math.random()*360);
+        this.tweens.add({ targets:o, x:tx+(Math.random()*50-25), y:ty+(Math.random()*36-18), angle:o.angle+240,
+          duration:320, delay:i*26, ease:'Quad.in', onComplete:()=>o.destroy() });
+      }
+      this.time.delayedCall(360, ()=>{ this.impact(tx,ty, ELEMENTS.terra.color, big); onImpact&&onImpact(); });
+      this.time.delayedCall(dur, ()=>onDone&&onDone()); return;
+    }
+    if(!el){ // neutral physical hit
+      this.time.delayedCall(130, ()=>{ this.impact(tx,ty, 0xffffff, false); onImpact&&onImpact(); });
+      this.time.delayedCall(500, ()=>onDone&&onDone()); return;
+    }
+    // ember / aqua / umbra / verdant — flying orb with trail
+    const color = ELEMENTS[el].color;
+    this.projectile(sx,sy,tx,ty,color, ()=>{ this.impact(tx,ty,color,big); onImpact&&onImpact(); });
+    this.time.delayedCall(dur, ()=>onDone&&onDone());
+  }
+
+  projectile(sx,sy,tx,ty,color,onArrive){
+    const orb=this.add.image(sx,sy,'fx_orb').setTint(color).setScale(1.0).setBlendMode('ADD').setDepth(28);
+    const trail=this.add.particles(0,0,'fx_dot',{ lifespan:280, scale:{start:0.9,end:0}, tint:color,
+      blendMode:'ADD', frequency:14, follow:orb }).setDepth(27);
+    this.tweens.add({ targets:orb, x:tx, y:ty, duration:300, ease:'Quad.in', onComplete:()=>{
+      orb.destroy(); trail.stop(); this.time.delayedCall(320,()=>trail.destroy()); onArrive&&onArrive();
+    }});
+  }
+
+  lightning(sx,sy,tx,ty,onStrike){
+    const g=this.add.graphics().setDepth(28).setBlendMode('ADD');
+    const draw=()=>{ g.clear(); g.lineStyle(3, ELEMENTS.volt.color, 1);
+      const seg=9; g.beginPath(); g.moveTo(sx,sy);
+      for(let i=1;i<seg;i++){ const t=i/seg; g.lineTo(sx+(tx-sx)*t+(Math.random()*44-22), sy+(ty-sy)*t+(Math.random()*44-22)); }
+      g.lineTo(tx,ty); g.strokePath();
+    };
+    let n=0; const tick=()=>{ draw(); if(++n<5) this.time.delayedCall(45,tick); else g.destroy(); };
+    tick();
+    this.time.delayedCall(140, ()=>onStrike&&onStrike());
+  }
+
+  impact(tx,ty,color,big){
+    const burst=this.add.particles(0,0,'fx_dot',{ speed:{min:90,max:big?340:230}, lifespan:{min:260,max:big?640:480},
+      scale:{start:big?1.7:1.2,end:0}, tint:color, blendMode:'ADD', quantity:0, emitting:false }).setDepth(31);
+    burst.explode(big?44:26, tx, ty);
+    const spark=this.add.particles(0,0,'fx_spark',{ speed:{min:140,max:big?420:300}, lifespan:{min:200,max:420},
+      scale:{start:1.0,end:0}, tint:0xffffff, blendMode:'ADD', quantity:0, emitting:false }).setDepth(32);
+    spark.explode(big?20:12, tx, ty);
+    // shockwave ring
+    const ring=this.add.image(tx,ty,'fx_orb').setTint(color).setBlendMode('ADD').setScale(0.4).setDepth(30);
+    this.tweens.add({ targets:ring, scale:big?3.4:2.1, alpha:0, duration:big?460:320, ease:'Cubic.out', onComplete:()=>ring.destroy() });
+    // camera drama
+    this.cameras.main.shake(big?280:150, big?0.020:0.009);
+    const c=Phaser.Display.Color.IntegerToRGB(color);
+    this.cameras.main.flash(big?170:80, c.r,c.g,c.b, false);
+    this.time.delayedCall(900, ()=>{ burst.destroy(); spark.destroy(); });
+  }
+
+  knock(spr, dir){ const x0=spr.x; this.tweens.add({ targets:spr, x:x0+dir*24, duration:90, yoyo:true, ease:'Quad.out' }); }
 
   applyEffect(mon, effect, who, move){
     if(effect==='raise_def'){ mon.def=Math.min(mon.baseDef*2, Math.floor(mon.def*1.3)); this.say(`${who} used ${move}! Defense rose!`); }
