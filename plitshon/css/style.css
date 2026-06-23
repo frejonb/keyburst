@@ -52,6 +52,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1c2b1c;
 #title .subtitle{margin-top:4px;font-size:18px;font-weight:bold;color:#FFE600;
   text-shadow:2px 2px 0 var(--ink);}
 #titleCanvas{display:block;margin:6px auto;}
+#titleMenu{display:flex;gap:10px;justify-content:center;margin-top:8px;}
+#titleMenu button{padding:8px 18px;font-family:inherit;font-weight:bold;font-size:15px;
+  letter-spacing:1px;cursor:pointer;border:3px solid var(--ink);border-radius:10px;
+  background:var(--cream);color:var(--ink);box-shadow:0 3px 0 var(--shadow);}
+#titleMenu #btnContinue{background:#FFE600;}
+#titleMenu button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow);}
+#menuActions{display:flex;justify-content:center;}
+#saveBtn{padding:9px 22px;font-family:inherit;font-weight:bold;font-size:15px;cursor:pointer;
+  border:3px solid var(--ink);border-radius:10px;background:#8FD3E8;color:var(--ink);box-shadow:0 3px 0 var(--shadow);}
+#saveBtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow);}
 #title .press{margin-top:6px;font-weight:bold;font-size:16px;color:#fff;
   text-shadow:2px 2px 0 var(--ink);animation:blink 1s steps(1) infinite;}
 @keyframes blink{50%{opacity:0;}}
