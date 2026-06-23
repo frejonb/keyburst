@@ -14,7 +14,7 @@ function newGame(){
     blocks: { ember:2, aqua:2, terra:1, volt:1, verdant:1, core:1 },
     items:  { potion:3 },
   };
-  GAME.flags = { intro:false };
+  GAME.flags = { intro:false, seenBattle:false, seenLoot:false, seenForge:false };
 }
 window.newGame = newGame;
 

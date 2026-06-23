@@ -34,7 +34,18 @@ class BattleScene extends Phaser.Scene {
     this.menu = this.add.container(0,0);
 
     this.say(`A wild ${this.enemy.name} appeared!`);
-    this.time.delayedCall(650, ()=>{ this.busy=false; this.showMain(); });
+    this.time.delayedCall(650, ()=>{
+      if(!GAME.flags.seenBattle){
+        GAME.flags.seenBattle = true;
+        Dialog.show(this, [
+          { speaker:'Forgekeeper Vael', text:"This is a battle! Tap FIGHT, then pick a move to attack." },
+          { speaker:'Forgekeeper Vael', text:"Moves have an element. Hit a foe with an element it's weak to for 'super effective' damage — mind the type matchups!" },
+          { speaker:'Forgekeeper Vael', text:"BAG uses items, SWITCH changes your active Forgemon, RUN flees a wild fight. Defeat it to win loot blocks!" },
+        ], ()=>{ this.busy=false; this.showMain(); });
+      } else {
+        this.busy=false; this.showMain();
+      }
+    });
   }
 
   // ---------- info boxes ----------
