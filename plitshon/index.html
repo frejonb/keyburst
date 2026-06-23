@@ -32,6 +32,10 @@
         <h1>PLITSHON</h1>
         <div class="subtitle">~ Tulipa Region ~</div>
         <canvas id="titleCanvas" width="320" height="150"></canvas>
+        <div id="titleMenu">
+          <button id="btnContinue" style="display:none">CONTINUE</button>
+          <button id="btnNew">NEW GAME</button>
+        </div>
         <div class="press" id="titlePress">PRESS OK / ENTER</div>
       </div>
     </div>
@@ -93,6 +97,9 @@
     <div class="menuSection"><h3>PARTY</h3><div id="menuParty"></div></div>
     <div class="menuSection"><h3>EGGS</h3><div id="menuEggs"></div></div>
     <div class="menuSection"><h3>ITEMS</h3><div id="menuItems"></div></div>
+    <div class="menuSection" id="menuActions">
+      <button id="saveBtn">💾 SAVE GAME</button>
+    </div>
   </div>
 </div>
 
@@ -120,6 +127,7 @@
 <script src="js/creatures.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/world.js"></script>
+<script src="js/save.js"></script>
 <script src="js/dialog.js"></script>
 <script src="js/movement.js"></script>
 <script src="js/inventory.js"></script>

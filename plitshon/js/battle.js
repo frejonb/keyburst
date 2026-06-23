@@ -230,6 +230,7 @@ function onEnemyFainted(){
     if(droppedEgg) addEgg(eggSpecies, eggLevel);
     if(isTrainer){
       battle.trainer.defeated=true; game.alertTrainer=null;
+      if(typeof saveGame==="function") saveGame();
       showDialog([battle.trainer.post], ()=> willEvo?doEvolution():endBattleReturn());
     } else {
       willEvo?doEvolution():endBattleReturn();

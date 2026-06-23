@@ -134,9 +134,9 @@ function enterDoctorCenter(){
   else msgs.push("Nurse Tineke: All better! Your Plitshon are fully healed.");
   showDialog(msgs, ()=>{
     healParty();
-    // step back out (south) so you don't re-trigger
     const p=game.player; p.dir=2;
     updateHUD();
+    if(typeof saveGame==="function") saveGame();   // autosave at Doctor Center
   });
 }
 function healParty(){
@@ -160,6 +160,7 @@ function tickEggs(){
     if(game.party.length<PARTY_MAX){ game.party.push(baby); where="It joined your party!"; }
     else { game.box.push(baby); where="Your party is full — it rests in the BOX."; }
     updateHUD();
+    spawnSparkleBurst(game.player.px+TILE/2, game.player.py, 22);
     showDialog([`Huh? Your egg is hatching!`, `The egg hatched into ${baby.name} (Lv.${baby.level})!`, where]);
   }
   updateHUD();
@@ -169,12 +170,17 @@ function tickEggs(){
 function findTruk(){
   if(game.flags.trukTaken) return;
   game.state=STATE.CUTSCENE;
+  game.cutsceneTruk=true;                 // Truk hops + emits hearts during dialog
   showDialog(STORY_FIND_TRUK, ()=>{
     game.flags.trukTaken=true;
     game.flags.hasTruk=true;
+    game.cutsceneTruk=false;
     game.party=[makePlitshon("truk",1)];
+    // celebratory sparkle burst where Truk was
+    spawnSparkleBurst(TRUK_SPOT.x*TILE+TILE/2, TRUK_SPOT.y*TILE+TILE/2, 26);
     updateHUD();
     game.state=STATE.OVERWORLD;
+    if(typeof saveGame==="function") saveGame();   // autosave after getting Truk
     showDialog(["Now the tall grass holds wild Plitshon to train against!","Defeat the 3 region trainers to become Champion."]);
   });
 }

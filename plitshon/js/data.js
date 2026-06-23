@@ -103,6 +103,13 @@ function buildMap(){
   put(16,40,T_SIGN);
   rect(6,43,5,2,T_TALL);
 
+  // === GUARANTEE CONNECTIVITY ===
+  // Re-stamp the main vertical road last so nothing (fences, fields,
+  // canal edges) can ever seal off a region. This keeps every area reachable.
+  rect(18,4,2,MH-6,T_PATH);
+  // open a clear gate through the Kaasdorp dike fence either side of the road
+  put(17,35,T_PATH); put(20,35,T_GRASS);
+
   return m;
 }
 let MAP = buildMap();

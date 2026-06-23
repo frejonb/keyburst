@@ -10,6 +10,11 @@ function rescale(){
 }
 
 function startGame(){
+  // title OK: continue if a save exists, else start fresh
+  if(hasSave()){ continueGame(); return; }
+  newGame();
+}
+function newGame(){
   document.getElementById("title").classList.remove("show");
   game.state=STATE.OVERWORLD;
   audioStart(); setMusic("field");
@@ -65,6 +70,18 @@ function setupTouch(){
   document.getElementById("menuClose").addEventListener("click", closeMenu);
   // mute
   document.getElementById("muteBtn").addEventListener("click", ()=>{ audioStart(); toggleMute(); });
+  // save button (in menu)
+  document.getElementById("saveBtn").addEventListener("click", ()=>{
+    flashMenuMsg(saveGame() ? "Game saved!" : "Could not save.");
+  });
+  // title buttons
+  document.getElementById("btnNew").addEventListener("click", (e)=>{ e.stopPropagation();
+    if(hasSave() && !confirm("Start a NEW GAME? This erases your saved progress.")) return;
+    deleteSave(); newGame();
+  });
+  const bc=document.getElementById("btnContinue");
+  bc.addEventListener("click",(e)=>{ e.stopPropagation(); continueGame(); });
+  if(hasSave()) bc.style.display="";
 }
 
 function syncDpad(){

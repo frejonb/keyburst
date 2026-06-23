@@ -22,6 +22,8 @@ const game = {
   flags: { hasTruk:false, seenTall:false, trukTaken:false },
   alertTrainer: null,
   npcFrame: 0,
+  fx: [],
+  cutsceneTruk: false,
 };
 
 const camera = { x:0, y:0 };
@@ -65,14 +67,49 @@ function renderWorld(t){
   const ents = [];
   for(const n of NPCS)      ents.push({ y:n.y, draw:()=>drawNPCFigure(ctx, n.x*TILE-ox, n.y*TILE-oy, n.dir, n.color) });
   for(const tr of TRAINERS) ents.push({ y:tr.y, draw:()=>drawTrainerEntity(tr, ox, oy) });
-  if(!game.flags.trukTaken)
-    ents.push({ y:TRUK_SPOT.y, draw:()=>drawOverworldCreature(ctx, TRUK_SPOT.x*TILE-ox, TRUK_SPOT.y*TILE-oy, "truk", t) });
+  if(!game.flags.trukTaken){
+    ents.push({ y:TRUK_SPOT.y, draw:()=>{
+      // animated hop during the find-Truk cutscene
+      let hopY = 0;
+      if(game.cutsceneTruk){
+        hopY = -Math.abs(Math.sin(t/150))*10;
+        // emit hearts occasionally
+        if(t - (game._lastHeart||0) > 380){ game._lastHeart=t; spawnHeart(TRUK_SPOT.x*TILE+TILE/2, TRUK_SPOT.y*TILE); }
+      }
+      drawOverworldCreature(ctx, TRUK_SPOT.x*TILE-ox, TRUK_SPOT.y*TILE-oy + hopY, "truk", t);
+      if(game.cutsceneTruk) drawEmote(ctx, TRUK_SPOT.x*TILE-ox+TILE/2, TRUK_SPOT.y*TILE-oy-14+hopY, "♥");
+    }});
+  }
   // player
   const p = game.player;
   ents.push({ y: p.py/TILE, draw:()=>drawPlayer(ctx, p.px-ox, p.py-oy, p.dir, p.frame) });
 
   ents.sort((a,b)=>a.y-b.y);
   for(const e of ents) e.draw();
+
+  drawFx(ox, oy);
+}
+
+// ---------- particle effects (story animations) ----------
+function spawnHeart(wx,wy){ game.fx.push({x:wx,y:wy,vx:(Math.random()-0.5)*14,vy:-34-Math.random()*16,life:0,max:1100,type:"heart"}); }
+function spawnSparkleBurst(wx,wy,n){ for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2,s=20+Math.random()*70; game.fx.push({x:wx,y:wy,vx:Math.cos(a)*s,vy:Math.sin(a)*s-20,life:0,max:800,type:"spark",c:choice(["#FFE600","#FF8FC0","#8FE6FF","#fff"])}); } }
+function updateFx(dt){
+  for(const f of game.fx){ f.life+=dt; f.x+=f.vx*dt/1000; f.y+=f.vy*dt/1000; f.vy+=60*dt/1000; }
+  game.fx = game.fx.filter(f=>f.life<f.max);
+}
+function drawFx(ox,oy){
+  for(const f of game.fx){
+    const a=1-f.life/f.max, x=f.x-ox, y=f.y-oy;
+    ctx.save(); ctx.globalAlpha=Math.max(0,a);
+    if(f.type==="heart"){ ctx.font="16px serif"; ctx.textAlign="center"; ctx.fillText("♥",x,y); }
+    else { ctx.fillStyle=f.c; ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
+}
+function drawEmote(c,x,y,ch){
+  c.save(); c.font="bold 16px serif"; c.textAlign="center";
+  c.fillStyle="#fff"; c.strokeStyle=PAL.outline; c.lineWidth=3;
+  c.strokeText(ch,x,y); c.fillStyle="#FF5E8A"; c.fillText(ch,x,y); c.restore();
 }
 
 function drawTrainerEntity(tr, ox, oy){
@@ -115,9 +152,12 @@ function updateHUD(){
 }
 
 // ---------- main loop ----------
+let _lastT = 0;
 function loop(t){
+  const dt = Math.min(50, t - _lastT || 16); _lastT = t;
   _time = t;
   game.npcFrame = Math.floor(t/350)%2;
+  if(game.fx.length) updateFx(dt);
 
   // advance player walk tween
   const p = game.player;
